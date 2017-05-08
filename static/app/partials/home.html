@@ -1,0 +1,100 @@
+<div class="container">
+	<div class="row">
+		<div class="col-lg-7">
+			<div class="jumbotron">
+				<h1>Hello & Welcome to Arad's Arcade Games.</h1>
+				<p>This is an demo project, 
+				which gives you the ability to play backgammon against 
+				other players online.</p>
+				<p>Go write a head and register. If you're already familiar with
+		 		this demo project click start play button.</p>
+		 		<h3>Enjoy!!! ;-)</h3>
+		 		<br/>
+			</div>
+		</div>
+		<div class="col-lg-4">
+			<h1>Sign Up.</h1>
+			<br/>
+			
+			<div style="margin: 5px" class="alert alert-danger" ng-show="register_error">
+    			{{register_error}}
+			</div>
+			
+			<br/>
+
+			<form novalidate id="registerForm" name="add_user_form" ng-submit="register()">
+				
+				<div class="form-group">
+					<label for="firstName">First Name:</label>
+					<input type="text" class="form-control" id="firstName" 
+						placeholder="Your First Name" name="firstName"
+						ng-required="true" ng-pattern="/^[A-Z|a-z| \\-]+$/"
+						ng-model="user.firstName">							
+				</div>
+			
+				<p class="text-danger lead" ng-show="add_user_form.firstName.$error.pattern">Invalid first name, use letters and spaces only.</p>
+				
+				<div class="form-group">
+					<label for="lastName">Last Name:</label>
+					<input type="text" class="form-control" id="lastName" 
+						placeholder="Your Last Name" name="lastName"
+						ng-required="true" ng-pattern="/^[A-Z|a-z| \\-]+$/"
+						ng-model="user.lastName">
+				</div>
+				
+				<p class="text-danger lead" ng-show="add_user_form.lastName.$error.pattern">Invalid last name, use letters and spaces only.</p>			
+				
+				<div class="form-group">
+					<label for="email">Email:</label>
+					<input type="text" class="form-control" id="email" 
+						placeholder="Your Email" name="email" 
+						ng-model="user.email"
+						
+						ng-blur="onEmailInsert()">
+				</div>
+				
+				<p id="invalidEmail" class="text-danger lead hidden">Invalid email address.</p>
+				  
+				<div class="form-group">
+					<label for="userName">User Name:</label>
+					<input type="text" class="form-control" id="userName" 
+						placeholder="User Name" name="basicUser.userName"
+						ng-model="user.userName"
+						ng-blur="onUserNameInsert(user)">
+				</div>
+				
+				<p id="invalidUserName" class="text-danger lead hidden"></p>
+				 
+				<div class="form-group">
+					<label for="password">Password:</label>
+					<input type="password" class="form-control" id="password" 
+						placeholder="Password" name="basicUser.password"
+						ng-model="user.password" 
+						
+						ng-focus="onCheckValidPassword(user)"
+						ng-keyup="onCheckValidPassword(user)"
+						ng-blur="onCheckValidPassword(user)">
+				</div>
+				
+				<p id="invalidPassword" class="text-danger lead hidden" ></p>
+				 
+				<div class="form-group">
+					<label for="confirmPassword">Confirm Password:</label>
+					<input type="password" class="form-control" id="confirmPassword" 
+						placeholder="Confirm Password" 
+						ng-model="user.confirm" 
+						
+						ng-focus="onCheckPasswordsMatch(user)"
+						ng-keyup="onCheckPasswordsMatch(user)"
+						ng-blur="onCheckPasswordsMatch(user)">
+				</div>
+				
+				<p id="invalidConfirmPassword" class="text-danger lead hidden"></p>
+				   
+				<button id="registerBtn" type="submit" class="btn btn-success">Register</button>
+			
+			</form>
+		</div>
+		<div class="col-lg-1"></div>
+	</div>
+</div>

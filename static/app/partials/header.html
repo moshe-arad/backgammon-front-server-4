@@ -1,0 +1,49 @@
+<nav class="navbar navbar-inverse">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-1">
+			</div>
+						
+
+			<div class="col-lg-10">
+				<div class="navbar-left" style="font-size:35px">Arad's Backgammon Game</div>	
+				<div class="navbar-right" ng-show="isAuthenticated">
+					<p class="lead" style="font-size:38px">Welcome {{credentials.username}} | <span class="label label-primary" ng-click="logout()">Logout</span></p> 						
+				</div>
+
+				<form id="loginForm" ng-hide="isAuthenticated" ng-submit="login()" class="navbar-form navbar-right" method="POST">
+
+					<div class="form-group">
+						<label for="userNameLogin">User Name:</label>
+						<br/>
+						<input id="loginUserName" type="text" class="form-control" ng-model="credentials.username" name="username" placeholder="User Name">
+					</div>
+	
+					<span>&nbsp;&nbsp;&nbsp;</span>
+	
+					<div class="form-group">
+						<label for="password">Password:</label>
+						<br/>
+						<input id="loginPassword" type="password" class="form-control" ng-model="credentials.password" name="password" placeholder="Password">
+					</div>
+	
+					<span>&nbsp;&nbsp;&nbsp;</span>
+	
+					<div class="form-group">
+						<br/>
+						<button type="submit" class="btn btn-primary">Log In</button>
+					</div>
+	
+					<p ng-show="error">Invalid Username or Password.</p>
+	
+					
+					<p ng-show="logoutSuccess">You have successfully logged out.</p>
+				</form>
+					
+			</div>
+
+			<div class="col-lg-1">
+			</div>
+		</div>
+	</div>
+</nav>
