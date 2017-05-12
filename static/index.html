@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html ng-app="backgammonApp">
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+		<meta name="viewport" content="width=device-width, initial-scale=1"></meta>
 		<title>Arad's Backgammon Game</title>
 		<link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
 		<link rel="stylesheet" href='/css/home.css' type="text/css" />
@@ -11,19 +11,27 @@
 
 		<!-- socket.io -->
 		<script src="/socket.io/socket.io.js"></script>
-		
+
+
+
 		<!-- angular -->
 		<script src="/js/jquery-3.1.1.min.js"></script>
-		<script src="/js/bootstrap.min.js" /></script>
+		<script src="/js/bootstrap.min.js"></script>
 		<script src="/js/angular.min.js" ></script>
 		<script src="/js/angular-route.min.js" ></script>
 		<script src="/js/angular-cookies.min.js" ></script>
+		<script src="/js/angular-resource.min.js"></script>
+		<script src="/js/ngStorage.js"></script>
 
 		<!-- controllers -->
 		<script src="/app/app.js" ></script>
 		<script src="/app/controllers/homeCtrl.js" ></script>
 		<script src="/app/controllers/headerCtrl.js" ></script>
 		<script src="/app/controllers/lobbyCtrl.js" ></script>
+
+		<!-- services -->
+		<script src="/app/services/AuthServices.js" ></script>
+
 
 		<div id="header" ng-include="'/app/partials/header.html'" ng-controller="HeaderCtrl"></div>
 

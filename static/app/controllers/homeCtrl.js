@@ -1,6 +1,6 @@
 (function(){
 
-	function HomeCtrl ($rootScope, $scope, $interval, $timeout, $location, $http) {
+	function HomeCtrl ($rootScope, $scope, $interval, $timeout, $location, $http, Auth) {
 
 		$scope.user = {};
 		$scope.register_error = false;
@@ -52,25 +52,34 @@
 
 		var submitForm = function(){
 			console.log("submitting form...");
-      console.log("With user = " + $scope.user);
-      console.log("With user = " + JSON.stringify($scope.user));
-			$http.post("http://localhost:3000/users/", $scope.user)
-			.success(function(data, status) {
-				if(status == 201){
+
+			var headers = {'Content-Type':'application/json'}
+
+      var config = {
+        'method':'POST',
+        'url':'http://localhost:3000/users/',
+        'headers':headers,
+        'data':JSON.stringify($scope.user)
+      }
+
+			$http(config)
+			.then(function(response) {
+				if(response.status == 201){
 					$rootScope.isAuthenticated = true;
-					$rootScope.credentials = {username:data.userName};
+					$rootScope.credentials = {username:JSON.parse(response.data).userName, password:JSON.parse(response.data).password};
+					Auth.loginNonHttp(JSON.parse(response.data));
 					console.log("Navigating to lobby");
 					$location.path("/lobby");
 				}
-				else if(status == 200){
+				else if(response.status == 200){
 					$scope.register_error = "This User already exists in system, try to do LogIn..."
 				}
-				else if(status == 500){
+				else if(response.status == 500){
 					console.log("Registeration failure");
 					$scope.register_error = "Failed to do registration."
 				}
-			})
-			.error(function (data, status) {
+			},
+			function (response) {
               	register_error = "Failed to do registration.";
 			});
 		}

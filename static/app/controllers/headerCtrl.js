@@ -1,55 +1,46 @@
 angular.module("backgammonApp")
     .controller('HeaderCtrl',
-    ['$rootScope', '$location', '$http',
-    function ($rootScope, $location, $http) {
+    ['$rootScope', '$location', '$http', 'Auth',
+    function ($rootScope, $location, $http, Auth) {
 
-    	$rootScope.credentials = {};
+    $rootScope.credentials = {};
 		$rootScope.isAuthenticated = false;
-
-	  var authenticate = function(credentials, callback) {
-
-	    var headers = credentials ? {authorization : "Basic "
-	        + btoa(credentials.username + ":" + credentials.password)
-	    } : {};
-
-	    $http.get('authenticateUser', {headers : headers}).success(function(data) {
-	      if (data.name) {
-	    	$rootScope.credentials.username = data.name;
-	        $rootScope.isAuthenticated = true;
-	    	$location.path("/lobby");
-	      } else {
-	        $rootScope.isAuthenticated = false;
-	      }
-	      callback && callback();
-	    }).error(function() {
-	      $rootScope.isAuthenticated = false;
-	      callback && callback();
-	    });
-
-	  }
-
-	  authenticate();
+    $rootScope.error = false;
 
 	  $rootScope.login = function() {
-	      authenticate($rootScope.credentials, function() {
-	        if ($rootScope.isAuthenticated) {
-	          $location.path("/lobby");
-	          self.error = false;
-	        } else {
-	          $location.path("/");
-	          self.error = true;
-	        }
-	      });
+          Auth.login($rootScope.credentials.username, $rootScope.credentials.password)
+              .then(function() {
+                  $rootScope.credentials.username = $rootScope.credentials.username;
+                  $rootScope.isAuthenticated = true;
+                  $rootScope.error = false;
+                  $location.path("/lobby");
+              }, function() {
+                console.log("User not found...");
+      	         $rootScope.isAuthenticated = false;
+                  $location.path("/");
+                  $rootScope.error = true;
+                  $scope.failed = true;
+              });
 	  };
 
 	  $rootScope.logout = function() {
-		  $http.post('http://localhost:3000/logout', {}).success(function() {
+      var headers = {'Content-Type':'application/json'}
+
+      var config = {
+        'method':'POST',
+        'url':'http://localhost:3000/logout',
+        'headers':headers,
+        'data':JSON.stringify({'username':$rootScope.credentials.username, 'password':$rootScope.credentials.password})
+      }
+
+		  $http(config).then(function (response) {
+        Auth.logout();
 		    $rootScope.isAuthenticated = false;
 		    $location.path("/");
 		    $rootScope.logoutSuccess = true;
-		  }).error(function(data) {
+        $rootScope.credentials = {};
+		  },function(response) {
 		    $rootScope.authenticated = false;
 		  });
 		};
-
     }]);
