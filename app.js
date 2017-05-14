@@ -44,4 +44,15 @@ io.on('connection', (socket) => {
       socket.emit('userNameCheckReply', response);
     });
   });
+
+  socket.on('room.join', (room) => {
+    console.log(socket.rooms);
+    Object.keys(socket.rooms).filter((r) => r != socket.id).forEach((r) => socket.leave(r));
+    socket.join(room);
+    console.log("User joined " + room  + " room.");
+  });
+
+  socket.on('room.open', (room) => {
+    socket.broadcast.to('lobby').emit('room.open', room);
+  });
 });

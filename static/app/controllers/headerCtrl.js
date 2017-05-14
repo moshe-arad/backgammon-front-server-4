@@ -3,8 +3,14 @@ angular.module("backgammonApp")
     ['$rootScope', '$location', '$http', 'Auth',
     function ($rootScope, $location, $http, Auth) {
 
-    $rootScope.credentials = {};
-		$rootScope.isAuthenticated = false;
+    if(Auth.isLoggedIn()){
+      $rootScope.credentials = {username: Auth.currentUser().userName, password: Auth.currentUser().password};
+  		$rootScope.isAuthenticated = true;
+    }else{
+      $rootScope.credentials = {};
+      $rootScope.isAuthenticated = false;
+    }
+
     $rootScope.error = false;
 
 	  $rootScope.login = function() {
@@ -14,6 +20,7 @@ angular.module("backgammonApp")
                   $rootScope.isAuthenticated = true;
                   $rootScope.error = false;
                   $location.path("/lobby");
+                  $rootScope.socket.emit('room.join', 'lobby');
               }, function() {
                 console.log("User not found...");
       	         $rootScope.isAuthenticated = false;

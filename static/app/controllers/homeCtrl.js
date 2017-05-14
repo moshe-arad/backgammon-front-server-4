@@ -14,7 +14,7 @@
 		var isUserNamePassedValidation = false;
 		var isPasswordPassedValidation = false;
 
-		var socket = io();
+		var socket = $rootScope.socket;
 
     socket.on('emailCheckReply', (data) => {
       if(JSON.parse(data.body).isAvailable == false){
@@ -70,6 +70,7 @@
 					Auth.loginNonHttp(JSON.parse(response.data));
 					console.log("Navigating to lobby");
 					$location.path("/lobby");
+					$rootScope.socket.emit('room.join', 'lobby');
 				}
 				else if(response.status == 200){
 					$scope.register_error = "This User already exists in system, try to do LogIn..."

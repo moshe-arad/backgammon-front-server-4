@@ -4,6 +4,16 @@ var backgammonApp = angular.module("backgammonApp", [ "ngRoute" , "ngCookies", "
 backgammonApp.run(['$rootScope', '$location', 'Auth', function ($rootScope, $location, Auth) {
     Auth.init();
 
+    $rootScope.socket = io({transports:['websocket'], upgrade: false});
+
+    $rootScope.socket.on('disconnect', () => {
+        Auth.logout();
+        $rootScope.credentials = {};
+        $rootScope.isAuthenticated = false;
+        $location.path("/");
+        $rootScope.$apply();
+    });
+
     $rootScope.$on('$routeChangeStart', function (event, next) {
         if (!Auth.checkPermissionForView(next)){
             event.preventDefault();
