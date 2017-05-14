@@ -3,8 +3,8 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
     virtualGameRooms: [
 			{
 				name:'Backgammon game 1',
-				open_by:'Barack Obama',
-				second:'Paris Hilton',
+				openBy:'Barack Obama',
+				secondPlayer:'Paris Hilton',
 				watchers:[
 					'Donald Trump',
 					'Abraham Lincoln',
@@ -12,8 +12,8 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 			]},
 			{
 				name:'Backgammon game 2',
-				open_by:'Oprah Winfrey',
-				second:'John F. Kennedy',
+				openBy:'Oprah Winfrey',
+				secondPlayer:'John F. Kennedy',
 				watchers:[
 					'David Beckham',
 					'Bill Clinton',
@@ -22,23 +22,23 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 			]},
 			{
 				name:'Backgammon game 3',
-				open_by:'Marilyn Monroe',
-				second:'Howard Stern',
+				openBy:'Marilyn Monroe',
+				secondPlayer:'Howard Stern',
 				watchers:[
 					'Selena Gomez',
 					'Elvis Presley'
 			]},
 			{
 				name:'Backgammon game 4',
-				open_by:'Britney Spears',
-				second:'Angelina Jolie',
+				openBy:'Britney Spears',
+				secondPlayer:'Angelina Jolie',
 				watchers:[
 					'Will Smith',
 			]},
 			{
 				name:'Backgammon game 5',
-				open_by:'Steven Spielberg',
-				second:'Kurt Cobain',
+				openBy:'Steven Spielberg',
+				secondPlayer:'Kurt Cobain',
 				watchers:[
 					'Charlie Sheen',
 					'Justin Timberlake',
@@ -46,16 +46,16 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 			]},
 			{
 				name:'Backgammon game 6',
-				open_by:'Katy Perry',
-			  second:'Brad Pitt',
+				openBy:'Katy Perry',
+			  secondPlayer:'Brad Pitt',
 				watchers:[
 					'Whoopi Goldberg',
 					'Elizabeth Taylor'
 			]},
 			{
 				name:'Backgammon game 7',
-				open_by:'Cristiano Ronaldo',
-				second:'Jim Carrey',
+				openBy:'Cristiano Ronaldo',
+				secondPlayer:'Jim Carrey',
 				watchers:[
 					'Halle Berry',
 					'Miley Cyrus',

@@ -6,15 +6,24 @@ module.exports = router;
 router.post('/lobby/room', (req, res) => {
   console.log("Will try to open a new game room...")
 
-  var headers = {'Content-Type':'application/json', 'Accept:application/json'};
+  var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
 
   var options = {
     method:'POST',
     headers:headers,
-    body:JSON.stringify(req.body)
+    body:JSON.stringify({'username':req.body.username})
   };
 
   request.post("http://localhost:8080/lobby/room", options, (error, response, body) => {
+    if(typeof error !== 'undefined' && error){
+        console.log("Error as occured, error = " + error);
+    }
+    else{
+      if(response.statusCode == 201) console.log("New Game room created successfuly...");
+      else if(response.statusCode == 200) console.log("Game room was not created...");
+
+      res.status(response.statusCode).json(response.body);
+    }
     res.end();
   });
 });
