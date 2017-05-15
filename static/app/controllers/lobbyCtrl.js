@@ -41,6 +41,10 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 
 	};
 
+	$scope.watchGame = function(roomName){
+			
+	};
+
 	$scope.closeGameRoom = function(){
 		//TODO complete code logic
 	};
