@@ -4,6 +4,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 	$scope.users = VirtualLobby.usersInLobby;
 	$scope.isOpenRoom = false;
 
+	$scope.register_error = false;
+
 	$rootScope.socket.on('room.open', function(room){
 			var temp = $scope.rooms;
 			$scope.rooms = addItemToArr(temp, room);
@@ -33,6 +35,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 			}
 			else if(response.status == 200){
 				console.log("Failed to open new game room...")
+				$scope.register_error = "This User already exists in one of the game rooms, thus can not open a new game room..."
 			}
 		}, function onError(response){
 			console.log("An error occured while trying to open a new game room...");
@@ -42,7 +45,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 	};
 
 	$scope.watchGame = function(roomName){
-			
+
 	};
 
 	$scope.closeGameRoom = function(){

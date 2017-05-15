@@ -56,6 +56,11 @@
 							<button id="openNewRoomBtn" type="button" class="btn btn-primary btn-lg btn-block" ng-hide="isOpenRoom" ng-click="openNewGameRoom()">
 								Open New Game Room
 							</button>
+
+							<div style="margin: 5px" class="alert alert-danger" ng-show="register_error">
+				    			{{register_error}}
+							</div>
+							
 							<button id="closeGameRoomBtn" type="button" class="btn btn-danger btn-lg btn-block" ng-show="isOpenRoom" ng-click="closeGameRoom()">
 								Cancel
 							</button>
