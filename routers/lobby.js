@@ -27,3 +27,30 @@ router.post('/lobby/room', (req, res) => {
     res.end();
   });
 });
+
+router.delete('/lobby/room/close', (req, res) => {
+  console.log("Will try to close game room...")
+
+  var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+  var options = {
+    method:'DELETE',
+    headers:headers,
+    body:JSON.stringify({'username':req.body.username})
+  };
+
+  request.delete("http://localhost:8080/lobby/room/close", options, (error, response, body) => {
+    if(typeof error !== 'undefined' && error){
+        console.log("Error as occured, error = " + error);
+    }
+    else{
+      if(response.statusCode == 200){
+        console.log("Game Room delete response accepted successfuly...")
+        console.log(JSON.stringify(response.body))
+
+        console.log("Response passed to front...")
+        res.status(response.statusCode).json(response.body);
+      }
+    }
+    res.end();
+  });
+});

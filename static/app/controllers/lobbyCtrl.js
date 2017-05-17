@@ -12,6 +12,10 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 			$scope.$apply();
 	});
 
+	var loadAllGamesRooms = function(){
+
+	};
+
 	$scope.openNewGameRoom = function(){
 		console.log("Will send request to open a new game room...")
 
@@ -49,7 +53,30 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 	};
 
 	$scope.closeGameRoom = function(){
-		//TODO complete code logic
+		var headers = {'Content-Type':'application/json', 'Accept':'application/json'}
+
+		var config = {
+			method:'DELETE',
+			url:'http://localhost:3000/lobby/room/close',
+			headers:headers,
+			data:JSON.stringify({'username':Auth.currentUser().userName})
+		};
+
+		$http(config).then(function onSuccess(response){
+			var isGameRoomDeleted = JSON.parse(response.data);
+
+			if(isGameRoomDeleted.gameRoomDeleted == true){
+				$scope.rooms = removeRoomByName($scope.rooms, isGameRoomDeleted.gameRoom)
+				$scope.isOpenRoom = false;
+			}
+			else {
+				$scope.register_error = "Failed to delete and close game room, try again later..."
+			}
+		}, function onError(response){
+			console.log("Failed to delete and close game room...");
+			$scope.register_error = "Failed to delete and close game room, try again later..."
+			console.log("Status code = " + response.status + ", text = " + response.statusText);
+		});
 	};
 
 	var addItemToArr = function(arr, item){
@@ -61,4 +88,13 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 		return result;
 	};
 
+	var removeRoomByName = function(arr, item){
+		var result = [];
+
+		for(i=0; i<arr.length; i++){
+			if(arr[i].name != item.name) result.push(arr[i]);
+		}
+
+		return result;
+	};
 }]);
