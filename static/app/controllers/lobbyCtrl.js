@@ -12,6 +12,12 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 			$scope.$apply();
 	});
 
+	$rootScope.socket.on('room.close', function(room){
+			var temp = $scope.rooms;
+			$scope.rooms = removeRoomByName(temp, room);
+			$scope.$apply();
+	});
+
 	var loadAllGamesRooms = function(){
 
 	};
@@ -68,6 +74,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 			if(isGameRoomDeleted.gameRoomDeleted == true){
 				$scope.rooms = removeRoomByName($scope.rooms, isGameRoomDeleted.gameRoom)
 				$scope.isOpenRoom = false;
+
+				$rootScope.socket.emit('room.close', JSON.parse(response.data).gameRoom)
 			}
 			else {
 				$scope.register_error = "Failed to delete and close game room, try again later..."

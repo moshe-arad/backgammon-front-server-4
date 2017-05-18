@@ -52,7 +52,11 @@ io.on('connection', (socket) => {
     console.log("User joined " + room  + " room.");
   });
 
-  socket.on('room.open', (room) => {
-    socket.broadcast.to('lobby').emit('room.open', room);
+  socket.on('room.open', (gameRoom) => {
+    socket.broadcast.to('lobby').emit('room.open', gameRoom);
+  });
+
+  socket.on('room.close', (gameRoom) => {
+    socket.broadcast.to('lobby').emit('room.close', gameRoom);
   });
 });

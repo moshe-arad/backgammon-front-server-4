@@ -45,8 +45,6 @@ router.delete('/lobby/room/close', (req, res) => {
     else{
       if(response.statusCode == 200){
         console.log("Game Room delete response accepted successfuly...")
-        console.log(JSON.stringify(response.body))
-
         console.log("Response passed to front...")
         res.status(response.statusCode).json(response.body);
       }
