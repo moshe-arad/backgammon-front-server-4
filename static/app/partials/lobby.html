@@ -28,24 +28,21 @@
 							<table class="table">
 								<thead>
 									<tr>
-										<th>#</th>
-										<th>Room Name</th>
-										<th>Open By</th>
-										<th>Second Player</th>
-										<th>Watchers #</th>
-										<th>Join</th>
-										<th>Watch</th>
+										<th><h3><span class="label label-default">#</span></h3></th>
+										<th><h3><span class="label label-default">Room Name</span></h3></th>
+										<th><h3><span class="label label-default">Open By</span></h3></th>
+										<th><h3><span class="label label-default">Second Player</span></h3></th>
+										<th><h3><span class="label label-default">Watchers #</span></h3></th>
 									</tr>
 								</thead>
 								<tbody ng-model="rooms" ng-repeat="room in rooms">
-									<tr>
-										<td>{{$index +1}}</td>
-										<td>{{room.name}}</td>
-										<td>{{room.openBy}}</td>
-										<td>{{room.secondPlayer}}</td>
-										<td>{{room.watchers.length}}</td>
-										<td><button type="button" class="btn btn-success">Join</button></td>
-										<td><button type="button" class="btn btn-primary" ng-click="watchGame(room.name)">Watch</button></td>
+									<tr ng-class="{info: {{room.name}}}" ng-mouseenter="highlightGameRoom(room.name)" ng-mouseleave="cancelHighlightGameRoom(room.name)">
+										<td><h3><span class="label label-default">{{$index +1}}</span></h3></td>
+										<td><h4>{{room.name}}</h4></td>
+										<td><h4>{{room.openBy}}</h4></td>
+										<td><h4>{{room.secondPlayer}}</h4></td>
+										<td><h4>{{room.watchers.length}}</h4></td>
+										<td><button type="button" class="btn btn-info btn-lg btn-block" ng-click="selectGameRoom(room.name)" ng-hide="btn{{room.name}}">{{select}}</button></td>
 									</tr>
 								</tbody>
 							</table>
@@ -53,18 +50,33 @@
 					</div>
 
 					<div class="row">
+						<div style="margin: 5px" class="alert alert-danger" ng-show="register_error">
+								{{register_error}}
+						</div>
+					</div>
+
+					<div class="row">
+						<div ng-hide="isMadeSelection">
 							<button id="openNewRoomBtn" type="button" class="btn btn-primary btn-lg btn-block" ng-hide="isOpenRoom" ng-click="openNewGameRoom()">
 								Open New Game Room
 							</button>
 
-							<div style="margin: 5px" class="alert alert-danger" ng-show="register_error">
-				    			{{register_error}}
-							</div>
-							
 							<button id="closeGameRoomBtn" type="button" class="btn btn-danger btn-lg btn-block" ng-show="isOpenRoom" ng-click="closeGameRoom()">
 								Cancel
 							</button>
+						</div>
+
+						<div ng-show="isMadeSelection">
+								<div class="col-lg-6">
+									<button type="button" class="btn btn-primary btn-lg btn-block">Join</button>
+								</div>
+								<div class="col-lg-6">
+									<button type="button" class="btn btn-primary btn-lg btn-block" ng-click="watchGame()">Watch</button>
+								</div>
+						</div>
 					</div>
+
+
 				</div>
 
 				<div class="col-lg-3" style="height=100%">

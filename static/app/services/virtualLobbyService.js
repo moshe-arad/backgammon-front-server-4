@@ -2,7 +2,7 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
   return {
     virtualGameRooms: [
 			{
-				name:'Backgammon game 1',
+				name:'BackgammonGameA',
 				openBy:'Barack Obama',
 				secondPlayer:'Paris Hilton',
 				watchers:[
@@ -11,7 +11,7 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 					'Bob Marley'
 			]},
 			{
-				name:'Backgammon game 2',
+				name:'BackgammonGameB',
 				openBy:'Oprah Winfrey',
 				secondPlayer:'John F. Kennedy',
 				watchers:[
@@ -21,7 +21,7 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 					'Michael Phelps'
 			]},
 			{
-				name:'Backgammon game 3',
+				name:'BackgammonGameC',
 				openBy:'Marilyn Monroe',
 				secondPlayer:'Howard Stern',
 				watchers:[
@@ -29,14 +29,14 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 					'Elvis Presley'
 			]},
 			{
-				name:'Backgammon game 4',
+				name:'BackgammonGameD',
 				openBy:'Britney Spears',
 				secondPlayer:'Angelina Jolie',
 				watchers:[
 					'Will Smith',
 			]},
 			{
-				name:'Backgammon game 5',
+				name:'BackgammonGameE',
 				openBy:'Steven Spielberg',
 				secondPlayer:'Kurt Cobain',
 				watchers:[
@@ -45,7 +45,7 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 					'Andy Warhol'
 			]},
 			{
-				name:'Backgammon game 6',
+				name:'BackgammonGameF',
 				openBy:'Katy Perry',
 			  secondPlayer:'Brad Pitt',
 				watchers:[
@@ -53,7 +53,7 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 					'Elizabeth Taylor'
 			]},
 			{
-				name:'Backgammon game 7',
+				name:'BackgammonGameG',
 				openBy:'Cristiano Ronaldo',
 				secondPlayer:'Jim Carrey',
 				watchers:[

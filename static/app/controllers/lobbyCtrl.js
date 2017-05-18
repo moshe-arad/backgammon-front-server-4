@@ -1,9 +1,9 @@
-angular.module("backgammonApp").controller("LobbyCtrl", ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope',
-function($scope, $http, VirtualLobby, Auth, $rootScope){
+angular.module("backgammonApp").controller("LobbyCtrl", ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope', '$parse',
+function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 	$scope.rooms = VirtualLobby.virtualGameRooms.reverse();
 	$scope.users = VirtualLobby.usersInLobby;
 	$scope.isOpenRoom = false;
-
+	$scope.select = "Select";
 	$scope.register_error = false;
 
 	$rootScope.socket.on('room.open', function(room){
@@ -19,6 +19,52 @@ function($scope, $http, VirtualLobby, Auth, $rootScope){
 	});
 
 	var loadAllGamesRooms = function(){
+		var rooms = $scope.rooms;
+
+		for(i=0; i<rooms.length; i++){
+			var model = $parse(rooms[i].name)
+			model.assign($scope, false);
+		}
+	};
+
+	loadAllGamesRooms();
+
+	$scope.isMadeSelection = false;
+
+	$scope.highlightGameRoom = function(gameRoomName){
+		if(!$scope.isMadeSelection){
+			var model = $parse(gameRoomName)
+			model.assign($scope, true);
+		}
+	};
+
+	$scope.cancelHighlightGameRoom = function(gameRoomName){
+		if(!$scope.isMadeSelection){
+			var model = $parse(gameRoomName)
+			model.assign($scope, false);
+		}
+	};
+
+	$scope.selectGameRoom = function(gameRoomName){
+		if($scope.select == "Select"){
+			$scope.isMadeSelection = true;
+			var rooms = $scope.rooms;
+			for(i=0; i<rooms.length; i++){
+				var model = $parse('btn' + rooms[i].name)
+				if((rooms[i].name) != gameRoomName) model.assign($scope, true);
+				else $scope.select = "Unselect";
+			}
+		}
+		else if($scope.select == "Unselect"){
+			$scope.isMadeSelection = false;
+
+			var rooms = $scope.rooms;
+			for(i=0; i<rooms.length; i++){
+				var model = $parse('btn' + rooms[i].name)
+				if((rooms[i].name) != gameRoomName) model.assign($scope, false);
+				else $scope.select = "Select";
+			}
+		}
 
 	};
 
