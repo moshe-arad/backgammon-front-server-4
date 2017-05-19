@@ -17,7 +17,10 @@ backgammonApp.run(['$rootScope', '$location', 'Auth', function ($rootScope, $loc
     $rootScope.$on('$routeChangeStart', function (event, next) {
         if (!Auth.checkPermissionForView(next)){
             event.preventDefault();
-            $location.path("#/login");
+            Auth.logout();
+            $rootScope.credentials = {};
+            $rootScope.isAuthenticated = false;
+            $location.path("/error");
         }
     });
 }]);
@@ -25,21 +28,29 @@ backgammonApp.run(['$rootScope', '$location', 'Auth', function ($rootScope, $loc
 
 backgammonApp.config(['$httpProvider', '$routeProvider', function ($httpProvider, $routeProvider) {
 
+console.log($routeProvider);
 	$routeProvider
 	.when("/", {
 		controller: "HomeCtrl",
 		templateUrl: "/app/partials/home.html",
-        requiresAuthentication: false
+    requiresAuthentication: false
 	})
 	.when("/error", {
 		controller: "HomeCtrl",
 		templateUrl: "/app/partials/error.html",
-        requiresAuthentication: false
+    requiresAuthentication: false
 	})
 	.when("/lobby", {
 		controller: "LobbyCtrl",
 		templateUrl: "/app/partials/lobby.html",
-        requiresAuthentication: true,
-        permissions: ["user"]
+    requiresAuthentication: true,
+    permissions: ["user"]
+	})
+  .when("/white/:roomName", {
+		controller: "BoardCtrl",
+		templateUrl: "/app/partials/whiteBoard.html",
+    requiresAuthentication: true,
+    permissions: ["user"]
 	});
 }]);
+//, params.roomName

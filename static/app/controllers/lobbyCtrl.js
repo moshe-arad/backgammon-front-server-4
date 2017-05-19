@@ -1,5 +1,5 @@
-angular.module("backgammonApp").controller("LobbyCtrl", ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope', '$parse', 'SocketioLobby',
-function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, socketioLobby){
+angular.module("backgammonApp").controller("LobbyCtrl", ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope', '$parse', 'SocketioLobby', '$location',
+function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, socketioLobby, $location){
 	$scope.rooms = VirtualLobby.virtualGameRooms.reverse();
 	$scope.users = VirtualLobby.usersInLobby;
 	$scope.isOpenRoom = false;
@@ -109,6 +109,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, socketioLobby){
 
 				$scope.isOpenRoom = true;
 				$rootScope.socket.emit('room.open', JSON.parse(response.data).gameRoom)
+
+				$location.path("/white/" + JSON.parse(response.data).gameRoom.name);
 			}
 			else if(response.status == 200){
 				console.log("Failed to open new game room...")
