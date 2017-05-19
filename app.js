@@ -59,4 +59,8 @@ io.on('connection', (socket) => {
   socket.on('room.close', (gameRoom) => {
     socket.broadcast.to('lobby').emit('room.close', gameRoom);
   });
+
+  socket.on('room.watcher', (data) => {
+    socket.broadcast.to('lobby').emit('room.watcher', data);
+  });
 });

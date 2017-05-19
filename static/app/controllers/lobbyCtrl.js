@@ -5,6 +5,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 	$scope.isOpenRoom = false;
 	$scope.select = "Select";
 	$scope.register_error = false;
+	$scope.isMadeSelection = false;
+
+	var selectedGameRoomName;
 
 	$rootScope.socket.on('room.open', function(room){
 			var temp = $scope.rooms;
@@ -18,6 +21,13 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 			$scope.$apply();
 	});
 
+	$rootScope.socket.on('room.watcher', function(data){
+			var temp = $scope.rooms;
+			$scope.rooms = addUserAsWatcher($scope.rooms, data.username, data.gameRoomName);
+			console.log($scope.rooms)
+			$scope.$apply();
+	});
+
 	var loadAllGamesRooms = function(){
 		var rooms = $scope.rooms;
 
@@ -28,8 +38,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 	};
 
 	loadAllGamesRooms();
-
-	$scope.isMadeSelection = false;
 
 	$scope.highlightGameRoom = function(gameRoomName){
 		if(!$scope.isMadeSelection){
@@ -54,6 +62,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 				if((rooms[i].name) != gameRoomName) model.assign($scope, true);
 				else $scope.select = "Unselect";
 			}
+
+			selectedGameRoomName = gameRoomName;
 		}
 		else if($scope.select == "Unselect"){
 			$scope.isMadeSelection = false;
@@ -64,8 +74,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 				if((rooms[i].name) != gameRoomName) model.assign($scope, false);
 				else $scope.select = "Select";
 			}
-		}
 
+			selectedGameRoomName = undefined;
+		}
 	};
 
 	$scope.openNewGameRoom = function(){
@@ -100,8 +111,35 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 
 	};
 
-	$scope.watchGame = function(roomName){
+	$scope.watchGame = function(){
+		console.log("Will try to add user as watcher...")
 
+		var headers = {'Content-Type':'application/json', 'Accept':'application/json'}
+
+		var config = {
+			method:'PUT',
+			url:'http://localhost:3000/lobby/room/watcher',
+			headers:headers,
+			data:JSON.stringify({'username':Auth.currentUser().userName, 'gameRoomName':selectedGameRoomName})
+		};
+
+		$http(config).then(function onSuccess(response){
+			var isUserAddedAsWatcher = JSON.parse(response.data);
+
+			if(isUserAddedAsWatcher.userAddedAsWatcher == true){
+				$scope.rooms = addUserAsWatcher($scope.rooms, Auth.currentUser().userName, selectedGameRoomName)
+
+				console.log($scope.rooms)
+				$rootScope.socket.emit('room.watcher', {'username':Auth.currentUser().userName, 'gameRoomName':selectedGameRoomName})
+			}
+			else {
+				$scope.register_error = "Failed to add watcher into game room, try again later..."
+			}
+		}, function onError(response){
+			console.log("Failed to add watcher into game room...");
+			$scope.register_error = "Failed to add watcher into game room, try again later..."
+			console.log("Status code = " + response.status + ", text = " + response.statusText);
+		});
 	};
 
 	$scope.closeGameRoom = function(){
@@ -147,6 +185,19 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 
 		for(i=0; i<arr.length; i++){
 			if(arr[i].name != item.name) result.push(arr[i]);
+		}
+
+		return result;
+	};
+
+	var addUserAsWatcher = function(arr, watcher, gameRoomName){
+		var result = [];
+
+		for(i=0; i<arr.length; i++){
+			if(arr[i].name == gameRoomName){
+					arr[i].watchers.push(watcher);
+			}
+			result.push(arr[i]);
 		}
 
 		return result;

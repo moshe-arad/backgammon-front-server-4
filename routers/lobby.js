@@ -52,3 +52,30 @@ router.delete('/lobby/room/close', (req, res) => {
     res.end();
   });
 });
+
+router.put('/lobby/room/watcher', (req, res) => {
+  console.log("Will try to add user as watcher...")
+
+  var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+
+  var options = {
+    method:'PUT',
+    headers:headers,
+    body:JSON.stringify({'username':req.body.username, 'gameRoomName':req.body.gameRoomName})
+  };
+
+  request.put("http://localhost:8080/lobby/room/watcher", options, (error, response, body) => {
+    if(typeof error !== 'undefined' && error){
+        console.log("Error as occured, error = " + error);
+    }
+    else{
+      if(response.statusCode == 200){
+        console.log("Add watcher response accepted successfuly...")
+        console.log("Response passed to front...")
+        res.status(response.statusCode).json(response.body);
+      }
+    }
+    res.end();
+  });
+
+});
