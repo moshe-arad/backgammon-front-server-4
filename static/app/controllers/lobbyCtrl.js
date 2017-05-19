@@ -1,5 +1,5 @@
-angular.module("backgammonApp").controller("LobbyCtrl", ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope', '$parse',
-function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
+angular.module("backgammonApp").controller("LobbyCtrl", ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope', '$parse', 'SocketioLobby',
+function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, socketioLobby){
 	$scope.rooms = VirtualLobby.virtualGameRooms.reverse();
 	$scope.users = VirtualLobby.usersInLobby;
 	$scope.isOpenRoom = false;
@@ -9,26 +9,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 
 	var selectedGameRoomName;
 
-	$rootScope.socket.on('room.open', function(room){
-			var temp = $scope.rooms;
-			$scope.rooms = addItemToArr(temp, room);
-			$scope.$apply();
-	});
+	var initLobby = function(){
+		loadAllGamesRooms();
 
-	$rootScope.socket.on('room.close', function(room){
-			var temp = $scope.rooms;
-			$scope.rooms = removeRoomByName(temp, room);
-			$scope.$apply();
-	});
-
-	$rootScope.socket.on('room.watcher', function(data){
-			var temp = $scope.rooms;
-			$scope.rooms = addUserAsWatcher($scope.rooms, data.username, data.gameRoomName);
-			console.log($scope.rooms)
-			$scope.$apply();
-	});
-
-	var loadAllGamesRooms = function(){
 		var rooms = $scope.rooms;
 
 		for(i=0; i<rooms.length; i++){
@@ -37,7 +20,34 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse){
 		}
 	};
 
-	loadAllGamesRooms();
+	var loadAllGamesRooms = function(){
+		console.log("Will try to load all game rooms...")
+
+		var headers = {'Content-Type':'application/json', 'Accept':'application/json'}
+
+		var config = {
+			method:'GET',
+			url:'http://localhost:3000/lobby/room/all',
+			headers:headers
+		};
+
+		$http(config).then(function onSuccess(response){
+			console.log("Loading all game rooms...");
+			if(response.status == 200){
+				var rooms = JSON.parse(response.data);
+
+				for(i=0; i<rooms.gameRooms.length; i++)
+					$scope.rooms = addItemToArr($scope.rooms, rooms.gameRooms[i])
+			}
+		}, function onError(response){
+			console.log("An error occured while trying to all game rooms...");
+			console.log("Status code = " + response.status + ", text = " + response.statusText);
+		});
+	};
+
+	socketioLobby.init();
+	initLobby();
+
 
 	$scope.highlightGameRoom = function(gameRoomName){
 		if(!$scope.isMadeSelection){

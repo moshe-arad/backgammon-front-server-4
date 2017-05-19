@@ -77,5 +77,29 @@ router.put('/lobby/room/watcher', (req, res) => {
     }
     res.end();
   });
+});
 
+router.get('/lobby/room/all', (req, res) => {
+  console.log('Will try to load all game rooms...')
+
+  var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+
+  var options = {
+    method:'GET',
+    headers:headers
+  };
+
+  request.get("http://localhost:8080/lobby/room/all", options, (error, response, body) => {
+    if(typeof error !== 'undefined' && error){
+        console.log("Error as occured, error = " + error);
+    }
+    else{
+      if(response.statusCode == 200){
+        console.log("Get all game rooms response accepted successfuly...")
+        console.log("Response passed to front...")
+        res.status(response.statusCode).json(response.body);
+      }
+    }
+    res.end();
+  });
 });
