@@ -33,14 +33,29 @@ var server = app.listen(3000, function () {
 var io = socketio(server);
 
 io.on('connection', (socket) => {
+
   socket.on('emailCheck', (data) => {
-    request.get('http://localhost:8080/users/email/' + data.email + '/', function(error, response){
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+
+    var options = {
+      method:'GET',
+      headers:headers
+    };
+
+    request.get('http://localhost:8080/users/email/' + data.email + '/', options, function(error, response){
       socket.emit('emailCheckReply', response);
     });
   });
 
   socket.on('userNameCheck', (data) => {
-    request.get('http://localhost:8080/users/user_name/' + data.userName + '/', function(error, response){
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+
+    var options = {
+      method:'GET',
+      headers:headers
+    };
+
+    request.get('http://localhost:8080/users/user_name/' + data.userName + '/', options, function(error, response){
       socket.emit('userNameCheckReply', response);
     });
   });

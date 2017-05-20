@@ -94,14 +94,21 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, socketioLobby, $
 
 		var headers = {'Content-Type':'application/json', 'Accept':'application/json'}
 
-		var config = {
+		var configOpenNewGameRoom = {
 			method:'POST',
 			url:'http://localhost:3000/lobby/room',
 			headers:headers,
 			data:JSON.stringify({'username':Auth.currentUser().userName})
 		};
 
-		$http(config).then(function onSuccess(response){
+		var configUpdatePermissions = {
+			method:'PUT',
+			url:'http://localhost:3000/users/permissions',
+			headers:headers,
+			data:JSON.stringify({'username':Auth.currentUser().userName})
+		};
+
+		$http(configOpenNewGameRoom).then(function onSuccess(response){
 			console.log("A new game room created...");
 			if(response.status == 201){
 				var temp = $scope.rooms;

@@ -1,7 +1,7 @@
 angular.module("backgammonApp")
     .controller('HeaderCtrl',
-    ['$rootScope', '$location', '$http', 'Auth',
-    function ($rootScope, $location, $http, Auth) {
+    ['$rootScope', '$location', '$http', 'Auth','$scope',
+    function ($rootScope, $location, $http, Auth, $scope) {
 
     if(Auth.isLoggedIn()){
       $rootScope.credentials = {username: Auth.currentUser().userName, password: Auth.currentUser().password};

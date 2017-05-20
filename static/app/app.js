@@ -28,7 +28,6 @@ backgammonApp.run(['$rootScope', '$location', 'Auth', function ($rootScope, $loc
 
 backgammonApp.config(['$httpProvider', '$routeProvider', function ($httpProvider, $routeProvider) {
 
-console.log($routeProvider);
 	$routeProvider
 	.when("/", {
 		controller: "HomeCtrl",
