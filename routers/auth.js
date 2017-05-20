@@ -9,11 +9,12 @@ router.post('/login', (req, res) => {
     }
 
     var options = {
+        method:'PUT',
         headers:headers,
-        qs:{"username":req.body.username, "password":req.body.password}
+        body:{"username":req.body.username, "password":req.body.password}
     }
 
-    request.get('http://localhost:8080/users/login', options, (error, response, body) => {
+    request.put('http://localhost:8080/users/login', options, (error, response, body) => {
         if(typeof error !== 'undefined' && error){
             console.log("Error as occured, error = " + error);
         }
@@ -44,11 +45,12 @@ router.post('/logout', (req, res) => {
   }
 
   var options = {
+      method:'PUT',
       headers:headers,
-      qs:{"username":req.body.username, "password":req.body.password}
+      body:{"username":req.body.username, "password":req.body.password}
   }
 
-  request.get('http://localhost:8080/users/logout', options, (error, response, body) => {
+  request.put('http://localhost:8080/users/logout', options, (error, response, body) => {
     if(typeof error !== 'undefined' && error){
       console.log("Error as occured, error = " + error);
     }
