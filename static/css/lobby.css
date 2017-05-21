@@ -14,3 +14,8 @@ td,th{
 	padding-right: 20px !important;
 	padding-left: 20px !important;
 }
+
+td{
+  border-right-style:none !important;
+  border-left-style:none !important;
+}

@@ -19,6 +19,7 @@ angular.module("backgammonApp")
                   $rootScope.credentials.username = $rootScope.credentials.username;
                   $rootScope.isAuthenticated = true;
                   $rootScope.error = false;
+                  $rootScope.socket.emit('auth', $rootScope.credentials);
                   $location.path("/lobby");
                   $rootScope.socket.emit('room.join', 'lobby');
               }, function() {

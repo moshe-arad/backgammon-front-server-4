@@ -18,8 +18,9 @@ angular.module("backgammonApp")
       				$rootScope.credentials = {username:JSON.parse(response.data).userName, password:JSON.parse(response.data).password};
       				auth.loginNonHttp(JSON.parse(response.data));
       				console.log("Navigating to lobby");
-      				$location.path("/lobby");
-      				$rootScope.socket.emit('room.join', 'lobby');
+              $rootScope.socket.emit('auth', $rootScope.credentials);
+      				// $location.path("/lobby");
+      				// $rootScope.socket.emit('room.join', 'lobby');
               return "created";
       			}
       			else if(response.status == 200){

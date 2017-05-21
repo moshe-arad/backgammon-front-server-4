@@ -32,15 +32,19 @@ var server = app.listen(3000, function () {
 //socket io
 var io = socketio(server);
 
+var clients = {};
+var client_id = 0;
+
 io.on('connection', (socket) => {
+
+  socket.on("disconnect", function() {
+    console.log(this.user.username + " was disconnected...") // prints: foobar
+    delete clients[this.client_id];
+  });
 
   socket.on('emailCheck', (data) => {
     var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
-
-    var options = {
-      method:'GET',
-      headers:headers
-    };
+    var options = { method:'GET', headers:headers };
 
     request.get('http://localhost:8080/users/email/' + data.email + '/', options, function(error, response){
       socket.emit('emailCheckReply', response);
@@ -50,14 +54,19 @@ io.on('connection', (socket) => {
   socket.on('userNameCheck', (data) => {
     var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
 
-    var options = {
-      method:'GET',
-      headers:headers
-    };
+    var options = { method:'GET', headers:headers };
 
     request.get('http://localhost:8080/users/user_name/' + data.userName + '/', options, function(error, response){
       socket.emit('userNameCheckReply', response);
     });
+  });
+
+  socket.on('auth', (user) => {
+    socket.client_id = client_id;
+    socket.user = user;
+    clients[client_id] = socket;
+    client_id++;
+    console.log("User = " + user.username + ", was authenticate.");
   });
 
   socket.on('room.join', (room) => {
