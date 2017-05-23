@@ -52,4 +52,3 @@ backgammonApp.config(['$httpProvider', '$routeProvider', function ($httpProvider
     permissions: ["user"]
 	});
 }]);
-//, params.roomName

@@ -38,8 +38,10 @@ var client_id = 0;
 io.on('connection', (socket) => {
 
   socket.on("disconnect", function() {
-    console.log(this.user.username + " was disconnected...") // prints: foobar
-    delete clients[this.client_id];
+    if(this.user !== undefined){
+      console.log(this.user.username + " was disconnected...") // prints: foobar
+      delete clients[this.client_id];
+    }
   });
 
   socket.on('emailCheck', (data) => {
@@ -87,4 +89,20 @@ io.on('connection', (socket) => {
   socket.on('room.watcher', (data) => {
     socket.broadcast.to('lobby').emit('room.watcher', data);
   });
+
+  socket.on('lobby.update', () => {
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+    var options = { method:'GET', headers:headers };
+
+    request.get('http://localhost:8080/lobby/update/view', options, function(error, response){
+      if(typeof error !== 'undefined' && error){
+          console.log("Error as occured, error = " + error);
+      }
+      else{
+        console.log(response.body)
+        socket.broadcast.emit('lobby.update.view', response.body);
+      }
+    });
+  });
+
 });

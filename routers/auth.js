@@ -40,9 +40,7 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  var headers = {
-      'Content-Type':'application/json'
-  }
+  var headers = { 'Content-Type':'application/json' }
 
   var options = {
       method:'PUT',
@@ -51,26 +49,8 @@ router.post('/logout', (req, res) => {
   }
 
   request.put('http://localhost:8080/users/logout', options, (error, response, body) => {
-    if(typeof error !== 'undefined' && error){
-      console.log("Error as occured, error = " + error);
-    }
-    else{
-      if(typeof body !== 'undefined' && body){
-        if(JSON.parse(body).isUserFound == true){
-          console.log("User found, and logged out...");
-          res.status(200);
-          res.end();
-        }
-        else if(JSON.parse(body).isUserFound == false){
-          console.log("User not found, did not logged out...");
-          res.status(500);
-          res.end();
-        }
-      }
-      else {
-        console.log("Error occured reading body, while trying to authenticate user...");
-      }
-    }
+    if(typeof error !== 'undefined' && error) console.log("Error as occured, error = " + error);
+    else res.status(response.statusCode).end();
   });
 });
 

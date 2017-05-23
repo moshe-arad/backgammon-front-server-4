@@ -32,13 +32,10 @@ angular.module("backgammonApp")
 	  };
 
 	  $rootScope.logout = function() {
-      var headers = {'Content-Type':'application/json'}
+      var headers = { 'Content-Type':'application/json' }
 
-      var config = {
-        'method':'POST',
-        'url':'http://localhost:3000/logout',
-        'headers':headers,
-        'data':JSON.stringify({'username':$rootScope.credentials.username, 'password':$rootScope.credentials.password})
+      var config = { 'method':'POST', 'url':'http://localhost:3000/logout', 'headers':headers,
+        'data':JSON.stringify({'username':$rootScope.credentials.username, 'password':$rootScope.credentials.password} )
       }
 
 		  $http(config).then(function (response) {
@@ -47,6 +44,9 @@ angular.module("backgammonApp")
 		    $location.path("/");
 		    $rootScope.logoutSuccess = true;
         $rootScope.credentials = {};
+
+        $rootScope.socket.emit('lobby.update');
+        
 		  },function(response) {
 		    $rootScope.authenticated = false;
 		  });

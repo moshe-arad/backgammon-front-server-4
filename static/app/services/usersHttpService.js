@@ -19,8 +19,8 @@ angular.module("backgammonApp")
       				auth.loginNonHttp(JSON.parse(response.data));
       				console.log("Navigating to lobby");
               $rootScope.socket.emit('auth', $rootScope.credentials);
-      				// $location.path("/lobby");
-      				// $rootScope.socket.emit('room.join', 'lobby');
+      				$location.path("/lobby");
+      				$rootScope.socket.emit('room.join', 'lobby');
               return "created";
       			}
       			else if(response.status == 200){
