@@ -78,10 +78,6 @@ io.on('connection', (socket) => {
     console.log("User joined " + room  + " room.");
   });
 
-  socket.on('room.open', (gameRoom) => {
-    socket.broadcast.to('lobby').emit('room.open', gameRoom);
-  });
-
   socket.on('room.close', (gameRoom) => {
     socket.broadcast.to('lobby').emit('room.close', gameRoom);
   });
@@ -100,7 +96,7 @@ io.on('connection', (socket) => {
       }
       else{
         console.log(response.body)
-        socket.broadcast.emit('lobby.update.view', response.body);
+        io.sockets.emit('lobby.update.view', response.body);
       }
     });
   });

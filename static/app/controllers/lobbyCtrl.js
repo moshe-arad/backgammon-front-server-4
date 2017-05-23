@@ -34,12 +34,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 
 	initLobby();
 
-	$rootScope.socket.on('room.open', function(room){
-			var temp = $scope.rooms;
-			$scope.rooms = addRoomToArr(temp, room);
-			$scope.$apply();
-	});
-
 	$rootScope.socket.on('room.close', function(room){
 			var temp = $scope.rooms;
 			$scope.rooms = removeRoom(temp, room);
@@ -49,39 +43,51 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$rootScope.socket.on('room.watcher', function(data){
 			var temp = $scope.rooms;
 			$scope.rooms = addUserAsWatcher($scope.rooms, data.username, data.gameRoomName);
-			console.log($scope.rooms)
 			$scope.$apply();
 	});
 
 	$rootScope.socket.on('lobby.update.view', (data) => {
+		console.log("Lobby Update View Recieved...")
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
+		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
 
-		for(var i=0; i<roomsToDelete.length; i++){
-			var temp = $scope.rooms;
-			$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+		if(roomsToDelete !== 'undefined'){
+			for(var i=0; i<roomsToDelete.length; i++){
+				var temp = $scope.rooms;
+				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+			}
 		}
 
-		for(var i=0; i<watchersToDelete.length; i++){
-			var gameRoom = findGameRoomByName(watchersToDelete[i].gameRoomName);
-			gameRoom = removeUserAsWatcher(watchersToDelete[i].watcher ,gameRoom);
-			$scope.rooms = updateGameRoom(gameRoom);
+		if(watchersToDelete !== 'undefined'){
+			for(var i=0; i<watchersToDelete.length; i++){
+				var gameRoom = findGameRoomByName(watchersToDelete[i].gameRoomName);
+				gameRoom = removeUserAsWatcher(watchersToDelete[i].watcher ,gameRoom);
+				$scope.rooms = updateGameRoom(gameRoom);
+			}
+		}
+
+		if(gameRoomsAdd !== 'undefined'){
+			for(var i=0; i<gameRoomsAdd.length; i++){
+				var temp = $scope.rooms;
+				temp.push(gameRoomsAdd[i])
+				$scope.rooms = temp;
+				if(gameRoomsAdd[i].openBy == Auth.currentUser().userName){
+					$scope.isOpenRoom = true;
+					$location.path("/white/" + gameRoomsAdd[i].name);
+				}
+			}
 		}
 	});
 
 	$scope.openNewGameRoom = () => {
 		lobbyHttpService.openNewGameRoom()
 		.then((response) => {
-			if(response.status == 201){
-				var temp = $scope.rooms;
-				$scope.rooms = addRoomToArr(temp, JSON.parse(response.data).gameRoom);
-
-				$scope.isOpenRoom = true;
-				$rootScope.socket.emit('room.open', JSON.parse(response.data).gameRoom)
-
-				$location.path("/white/" + JSON.parse(response.data).gameRoom.name);
+			if(response.status == 201) {
+				$rootScope.socket.emit('lobby.update');
+				console.log("Lobby Update Sent..")
 			}
-			else if(response.status == 200){
+			else{
 				console.log("Failed to open new game room...")
 				$scope.register_error = "This User already exists in one of the game rooms, thus can not open a new game room..."
 			}
