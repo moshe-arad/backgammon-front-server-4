@@ -1,6 +1,8 @@
 angular.module("backgammonApp").factory("VirtualLobby",[function(){
   return {
-    virtualGameRooms: [
+    virtualGameRooms: () => {
+      var arr = new Array(7);
+      arr = [
 			{
 				name:'BackgammonGameA',
 				openBy:'Barack Obama',
@@ -61,9 +63,14 @@ angular.module("backgammonApp").factory("VirtualLobby",[function(){
 					'Miley Cyrus',
 					'Carrie Fisher'
 			]},
-		],
-
+		]
+    return arr;
+  },
     //users name in lobby
-    usersInLobby : ['Stevie Wonder', 'Courtney Love', 'Bob Hope', 'Justin Bieber', 'Mel Gibson', 'Howard Hughes', 'Woody Allen', 'Tiger Woods', 'Robert De Niro', 'Jennifer Lopez']
+    usersInLobby: () => {
+      var arr = new Array(10);
+      arr = ['Stevie Wonder', 'Courtney Love', 'Bob Hope', 'Justin Bieber', 'Mel Gibson', 'Howard Hughes', 'Woody Allen', 'Tiger Woods', 'Robert De Niro', 'Jennifer Lopez']
+      return arr;
+    }
   };
 }]);

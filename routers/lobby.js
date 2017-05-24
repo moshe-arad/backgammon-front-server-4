@@ -97,7 +97,7 @@ router.get('/lobby/room/all', (req, res) => {
       if(response.statusCode == 200){
         console.log("Get all game rooms response accepted successfuly...")
         console.log("Response passed to front...")
-        res.status(response.statusCode).json(response.body);
+        res.status(response.statusCode).end();
       }
     }
     res.end();

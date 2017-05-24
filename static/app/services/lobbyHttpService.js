@@ -1,25 +1,6 @@
 angular.module("backgammonApp")
     .factory('LobbyHttpService', ['$q', '$http', 'Auth', function($q, $http, auth){
       return{
-        loadAllGamesRooms: () => {
-          var deferred = $q.defer();
-
-      		console.log("Will try to load all game rooms...")
-      		var headers = { 'Content-Type':'application/json', 'Accept':'application/json' }
-      		var config = { method:'GET', url:'http://localhost:3000/lobby/room/all', headers:headers };
-
-      		$http(config).then(function onSuccess(response){
-      			console.log("Loading all game rooms...");
-      			if(response.status == 200){
-      				var rooms = JSON.parse(response.data);
-      				deferred.resolve(rooms);
-      			}
-      		}, function onError(response){
-            deferred.reject("An error occured while trying to all game rooms, " + "Status code = " + response.status + ", text = " + response.statusText);
-      		});
-
-          return deferred.promise;
-      	},
         openNewGameRoom: () => {
           var deferred = $q.defer();
 

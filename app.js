@@ -86,9 +86,12 @@ io.on('connection', (socket) => {
     socket.broadcast.to('lobby').emit('room.watcher', data);
   });
 
-  socket.on('lobby.update', () => {
+  socket.on('lobby.update', (username) => {
     var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
-    var options = { method:'GET', headers:headers };
+    var options;
+
+    if(username !== undefined) options = { method:'GET', headers:headers, qs:{'username':username} };
+    else options = { method:'GET', headers:headers};
 
     request.get('http://localhost:8080/lobby/update/view', options, function(error, response){
       if(typeof error !== 'undefined' && error){

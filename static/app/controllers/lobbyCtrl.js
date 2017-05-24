@@ -1,9 +1,10 @@
 angular.module("backgammonApp").controller("LobbyCtrl",
 ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope',
-'$parse', '$location', 'LobbyHttpService',
+'$parse', '$location', 'LobbyHttpService', '$route',
 function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobbyHttpService){
-	$scope.rooms = VirtualLobby.virtualGameRooms.reverse();
+	$scope.rooms = VirtualLobby.virtualGameRooms().reverse();
 	$scope.users = VirtualLobby.usersInLobby;
+
 	$scope.isOpenRoom = false;
 	$scope.select = "Select";
 	$scope.register_error = false;
@@ -21,18 +22,12 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	};
 
 	var initLobby = function(){
-		lobbyHttpService.loadAllGamesRooms().then((response) => {
-			for(var i=0; i<response.gameRooms.length; i++){
-				$scope.rooms = addRoomToArr($scope.rooms, response.gameRooms[i])
-			}
-		}, (response) => {
-			console.log(response);
-		});
-
+		$rootScope.socket.emit('lobby.update', Auth.currentUser().userName);
 		createRoomModels();
 	};
 
 	initLobby();
+
 
 	$rootScope.socket.on('room.close', function(room){
 			var temp = $scope.rooms;
@@ -51,31 +46,59 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
+		var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser
 
-		if(roomsToDelete !== 'undefined'){
-			for(var i=0; i<roomsToDelete.length; i++){
-				var temp = $scope.rooms;
-				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+		console.log("************ gameRoomsAddPerUser = " + JSON.stringify(gameRoomsAddPerUser))
+		console.log("************ gameRoomsAdd = " + JSON.stringify(gameRoomsAdd))
+		console.log("************ roomsToDelete = " + JSON.stringify(roomsToDelete))
+
+		if(angular.isDefined(gameRoomsAddPerUser) && angular.isDefined(Auth.currentUser())){
+			var username = Auth.currentUser().userName;
+			if(angular.isDefined(gameRoomsAddPerUser[username])){
+				if(gameRoomsAddPerUser[username].length == 0) {
+					delete $scope.rooms
+					$scope.rooms = VirtualLobby.virtualGameRooms().reverse();
+				}
+				else{
+					var temp = $scope.rooms
+					for(var i=0; i<gameRoomsAddPerUser[username].length; i++){
+						temp = addRoomToArr(temp, gameRoomsAddPerUser[username][i]);
+					}
+					$scope.rooms = temp;
+				}
+
+				$scope.$apply();
 			}
 		}
 
-		if(watchersToDelete !== 'undefined'){
+		if(angular.isDefined(roomsToDelete) == true){
+			for(var i=0; i<roomsToDelete.length; i++){
+				var temp = $scope.rooms;
+				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+				$scope.$apply();
+			}
+		}
+
+		if(angular.isDefined(watchersToDelete) == true){
 			for(var i=0; i<watchersToDelete.length; i++){
 				var gameRoom = findGameRoomByName(watchersToDelete[i].gameRoomName);
 				gameRoom = removeUserAsWatcher(watchersToDelete[i].watcher ,gameRoom);
 				$scope.rooms = updateGameRoom(gameRoom);
+				$scope.$apply();
 			}
 		}
 
-		if(gameRoomsAdd !== 'undefined'){
+		if(angular.isDefined(gameRoomsAdd) == true){
 			for(var i=0; i<gameRoomsAdd.length; i++){
 				var temp = $scope.rooms;
 				temp.push(gameRoomsAdd[i])
 				$scope.rooms = temp;
 				if(gameRoomsAdd[i].openBy == Auth.currentUser().userName){
 					$scope.isOpenRoom = true;
-					$location.path("/white/" + gameRoomsAdd[i].name);
+					$location.url("/white/" + gameRoomsAdd[i].name);
 				}
+
+				$scope.$apply();
 			}
 		}
 	});
