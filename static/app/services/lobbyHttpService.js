@@ -26,8 +26,7 @@ angular.module("backgammonApp")
             data:JSON.stringify({'username':auth.currentUser().userName, 'gameRoomName':selectedGameRoomName}) };
 
       		$http(config).then(function onSuccess(response){
-      			var isUserAddedAsWatcher = JSON.parse(response.data);
-            deferred.resolve(isUserAddedAsWatcher.userAddedAsWatcher);
+            deferred.resolve(response);
       		}, function onError(response){
       			deferred.reject("Failed to add watcher into game room, try again later...");
       		});

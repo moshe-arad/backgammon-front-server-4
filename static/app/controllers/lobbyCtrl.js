@@ -46,7 +46,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
-		var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser
+		var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser;
+		var addWatchers = JSON.parse(data).addWatchers;
 
 		console.log("************ gameRoomsAddPerUser = " + JSON.stringify(gameRoomsAddPerUser))
 		console.log("************ gameRoomsAdd = " + JSON.stringify(gameRoomsAdd))
@@ -76,6 +77,24 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				var temp = $scope.rooms;
 				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
 				$scope.$apply();
+			}
+		}
+
+		if(angular.isDefined(addWatchers) == true){
+			for(var i=0; i<addWatchers.length; i++){
+				var gameRoom = findGameRoomByName(addWatchers[i].gameRoomName);
+				var watchers = gameRoom.watchers;
+				watchers.push(addWatchers[i].watcher);
+				delete gameRoom.watchers;
+				gameRoom.watchers = watchers;
+				$scope.rooms = updateGameRoom(gameRoom);
+
+				$scope.$apply();
+
+				if(addWatchers[i].watcher == Auth.currentUser().userName){
+					$location.url("/white/" + addWatchers[i].gameRoomName);
+				}
+
 			}
 		}
 
@@ -122,12 +141,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.watchGame = () => {
 		lobbyHttpService.watchGame(selectedGameRoomName)
 		.then((response) => {
-			if(response === true){
-				$scope.rooms = addUserAsWatcher($scope.rooms, Auth.currentUser().userName, selectedGameRoomName)
-				$rootScope.socket.emit('room.watcher', {'username':Auth.currentUser().userName, 'gameRoomName':selectedGameRoomName})
-			} else{
-				$scope.register_error = "You can watch or play only one game at a time, Failed to add watcher into game room, try again later..."
-			}
+			$rootScope.socket.emit('lobby.update');
 		}, (response) => {
 				$scope.register_error = response;
 		});
