@@ -33,6 +33,22 @@ angular.module("backgammonApp")
 
           return deferred.promise;
       	},
+        joinGame: (selectedGameRoomName) => {
+          var deferred = $q.defer();
+
+      		console.log("Will try to add user as second player...")
+      		var headers = { 'Content-Type':'application/json', 'Accept':'application/json' }
+      		var config = { method:'PUT', url:'http://localhost:3000/lobby/room/second/player', headers:headers,
+            data:JSON.stringify({'username':auth.currentUser().userName, 'gameRoomName':selectedGameRoomName}) };
+
+      		$http(config).then(function onSuccess(response){
+            deferred.resolve(response);
+      		}, function onError(response){
+      			deferred.reject("Failed to add watcher into game room, try again later...");
+      		});
+
+          return deferred.promise;
+        },
         closeGameRoom: () => {
           var deferred = $q.defer();
 

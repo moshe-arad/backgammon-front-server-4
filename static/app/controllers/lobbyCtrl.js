@@ -48,6 +48,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
 		var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser;
 		var addWatchers = JSON.parse(data).addWatchers;
+		var addSecondPlayers = JSON.parse(data).addSecondPlayer
 
 		console.log("************ gameRoomsAddPerUser = " + JSON.stringify(gameRoomsAddPerUser))
 		console.log("************ gameRoomsAdd = " + JSON.stringify(gameRoomsAdd))
@@ -68,6 +69,14 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 					$scope.rooms = temp;
 				}
 
+				$scope.$apply();
+			}
+		}
+
+		if(angular.isDefined(addSecondPlayers) == true){
+			for(var i=0; i<addSecondPlayers.length; i++){
+				var gameRoom = findGameRoomByName(addSecondPlayers[i].gameRoomName);
+				gameRoom.secondPlayer = addSecondPlayers[i].secondPlayer;
 				$scope.$apply();
 			}
 		}
@@ -146,6 +155,15 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				$scope.register_error = response;
 		});
 	}
+
+	$scope.joinGame = () => {
+		lobbyHttpService.joinGame(selectedGameRoomName)
+		.then((response) => {
+			$rootScope.socket.emit('lobby.update');
+		}, (response) => {
+				$scope.register_error = response;
+		});
+	};
 
 	$scope.closeGameRoom = () =>{
 		lobbyHttpService.closeGameRoom()

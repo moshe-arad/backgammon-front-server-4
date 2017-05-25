@@ -79,27 +79,53 @@ router.put('/lobby/room/watcher', (req, res) => {
   });
 });
 
-router.get('/lobby/room/all', (req, res) => {
-  console.log('Will try to load all game rooms...')
+router.put('/lobby/room/second/player', (req, res) => {
+  console.log("Will try to add user as second player...")
 
   var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
 
   var options = {
-    method:'GET',
-    headers:headers
+    method:'PUT',
+    headers:headers,
+    body:JSON.stringify({'username':req.body.username, 'gameRoomName':req.body.gameRoomName})
   };
 
-  request.get("http://localhost:8080/lobby/room/all", options, (error, response, body) => {
+  request.put("http://localhost:8080/lobby/room/second/player", options, (error, response, body) => {
     if(typeof error !== 'undefined' && error){
         console.log("Error as occured, error = " + error);
     }
     else{
       if(response.statusCode == 200){
-        console.log("Get all game rooms response accepted successfuly...")
+        console.log("Add watcher response accepted successfuly...")
         console.log("Response passed to front...")
-        res.status(response.statusCode).end();
+        res.status(response.statusCode).json(response.body);
       }
     }
     res.end();
   });
 });
+
+// router.get('/lobby/room/all', (req, res) => {
+//   console.log('Will try to load all game rooms...')
+//
+//   var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+//
+//   var options = {
+//     method:'GET',
+//     headers:headers
+//   };
+//
+//   request.get("http://localhost:8080/lobby/room/all", options, (error, response, body) => {
+//     if(typeof error !== 'undefined' && error){
+//         console.log("Error as occured, error = " + error);
+//     }
+//     else{
+//       if(response.statusCode == 200){
+//         console.log("Get all game rooms response accepted successfuly...")
+//         console.log("Response passed to front...")
+//         res.status(response.statusCode).end();
+//       }
+//     }
+//     res.end();
+//   });
+// });
