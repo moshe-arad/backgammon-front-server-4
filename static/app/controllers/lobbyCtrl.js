@@ -22,7 +22,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	};
 
 	var initLobby = function(){
-		$rootScope.socket.emit('lobby.update', Auth.currentUser().userName);
+		lobbyHttpService.loadAllGamesRooms();
+		$rootScope.socket.emit('lobby.update', {'user':Auth.currentUser().userName});
 		createRoomModels();
 	};
 
@@ -46,38 +47,22 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
-		var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser;
+		// var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser;
 		var addWatchers = JSON.parse(data).addWatchers;
 		var addSecondPlayers = JSON.parse(data).addSecondPlayer
 
-		console.log("************ gameRoomsAddPerUser = " + JSON.stringify(gameRoomsAddPerUser))
-		console.log("************ gameRoomsAdd = " + JSON.stringify(gameRoomsAdd))
-		console.log("************ roomsToDelete = " + JSON.stringify(roomsToDelete))
-
-		if(angular.isDefined(gameRoomsAddPerUser) && angular.isDefined(Auth.currentUser())){
-			var username = Auth.currentUser().userName;
-			if(angular.isDefined(gameRoomsAddPerUser[username])){
-				if(gameRoomsAddPerUser[username].length == 0) {
-					delete $scope.rooms
-					$scope.rooms = VirtualLobby.virtualGameRooms().reverse();
-				}
-				else{
-					var temp = $scope.rooms
-					for(var i=0; i<gameRoomsAddPerUser[username].length; i++){
-						temp = addRoomToArr(temp, gameRoomsAddPerUser[username][i]);
-					}
-					$scope.rooms = temp;
-				}
-
-				$scope.$apply();
-			}
-		}
+		console.log("*** Update view message accepted ***");
 
 		if(angular.isDefined(addSecondPlayers) == true){
 			for(var i=0; i<addSecondPlayers.length; i++){
 				var gameRoom = findGameRoomByName(addSecondPlayers[i].gameRoomName);
 				gameRoom.secondPlayer = addSecondPlayers[i].secondPlayer;
 				$scope.$apply();
+
+				if(addSecondPlayers[i].secondPlayer == Auth.currentUser().userName){
+					$location.url("/black/" + addSecondPlayers[i].gameRoomName);
+				}
+
 			}
 		}
 
@@ -98,12 +83,11 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				gameRoom.watchers = watchers;
 				$scope.rooms = updateGameRoom(gameRoom);
 
-				$scope.$apply();
-
 				if(addWatchers[i].watcher == Auth.currentUser().userName){
 					$location.url("/white/" + addWatchers[i].gameRoomName);
 				}
 
+				$scope.$apply();
 			}
 		}
 
@@ -135,7 +119,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		lobbyHttpService.openNewGameRoom()
 		.then((response) => {
 			if(response.status == 201) {
-				$rootScope.socket.emit('lobby.update');
+				$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 				console.log("Lobby Update Sent..")
 			}
 			else{
@@ -150,7 +134,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.watchGame = () => {
 		lobbyHttpService.watchGame(selectedGameRoomName)
 		.then((response) => {
-			$rootScope.socket.emit('lobby.update');
+			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 		}, (response) => {
 				$scope.register_error = response;
 		});
@@ -159,7 +143,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.joinGame = () => {
 		lobbyHttpService.joinGame(selectedGameRoomName)
 		.then((response) => {
-			$rootScope.socket.emit('lobby.update');
+			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 		}, (response) => {
 				$scope.register_error = response;
 		});

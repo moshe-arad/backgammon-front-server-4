@@ -73,9 +73,34 @@ io.on('connection', (socket) => {
 
   socket.on('room.join', (room) => {
     console.log(socket.rooms);
-    Object.keys(socket.rooms).filter((r) => r != socket.id).forEach((r) => socket.leave(r));
     socket.join(room);
     console.log("User joined " + room  + " room.");
+
+    if(typeof io.sockets.adapter.rooms['lobby'] !== 'undefined'){
+      var clients = io.sockets.adapter.rooms['lobby'].sockets;
+
+      console.log("In Lobby Room:");
+
+      for (var client in clients ) {
+        console.log('Username: ' + JSON.stringify(client));
+      }
+    }
+  });
+
+  socket.on('room.leave', (room) => {
+    console.log(socket.rooms);
+    socket.leave(room);
+    console.log("User left " + room  + " room.");
+
+    if(typeof io.sockets.adapter.rooms['lobby'] !== 'undefined'){
+      var clients = io.sockets.adapter.rooms['lobby'].sockets;
+
+      console.log("In Lobby Room:");
+
+      for (var client in clients ) {
+        console.log('Username: ' + JSON.stringify(client));
+      }
+    }
   });
 
   socket.on('room.close', (gameRoom) => {
@@ -86,12 +111,14 @@ io.on('connection', (socket) => {
     socket.broadcast.to('lobby').emit('room.watcher', data);
   });
 
-  socket.on('lobby.update', (username) => {
+  socket.on('lobby.update', (parties) => {
     var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
     var options;
 
-    if(username !== undefined) options = { method:'GET', headers:headers, qs:{'username':username} };
-    else options = { method:'GET', headers:headers};
+    if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
+    else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
+    else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
+    else options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':'none'} };
 
     request.get('http://localhost:8080/lobby/update/view', options, function(error, response){
       if(typeof error !== 'undefined' && error){
@@ -99,7 +126,21 @@ io.on('connection', (socket) => {
       }
       else{
         console.log(response.body)
-        io.sockets.emit('lobby.update.view', response.body);
+        console.log(parties)
+
+        if(parties.all !== undefined) io.sockets.emit('lobby.update.view', response.body);
+        else if(parties.group !== undefined) {
+          socket.emit('lobby.update.view', response.body);
+          socket.broadcast.to(parties.group).emit('lobby.update.view', response.body);
+        }
+        else if(parties.user !== undefined){
+          for(var key in clients){
+            if(clients[key].user.username == parties.user){
+              clients[key].emit('lobby.update.view', response.body);
+              break;
+            }
+          }
+        }
       }
     });
   });

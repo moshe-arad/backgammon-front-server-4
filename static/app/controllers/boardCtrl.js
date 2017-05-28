@@ -1,7 +1,10 @@
 angular.module("backgammonApp").controller("BoardCtrl", ['$scope', '$http', 'Auth', '$routeParams','$rootScope', '$route', '$location',
 function($scope, $http, Auth, $routeParams, $rootScope, $route, $location){
-  // $route.routes["/white/:roomName"].permissions.push($routeParams.roomName)
-  //
+
+  $route.routes["/white/:roomName"].permissions.push($routeParams.roomName)
+
+  console.log($route);
+
   // var authorizeUser = function(){
   //   if(Auth.userHasPermission([$routeParams.roomName]) == false) {
   //     $rootScope.credentials = {};
@@ -10,7 +13,7 @@ function($scope, $http, Auth, $routeParams, $rootScope, $route, $location){
   //     $location.path("/error")
   //   }
   // }
-  //
+
   // authorizeUser();
 
 }]);
