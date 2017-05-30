@@ -145,4 +145,36 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('users.update', (parties) => {
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+    var options;
+
+    if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
+    else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
+    else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
+    else options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':'none'} };
+
+    request.get('http://localhost:8080/users/update/view', options, function(error, response){
+      if(typeof error !== 'undefined' && error){
+          console.log("Error as occured, error = " + error);
+      }
+      else{
+        console.log(response.body)
+
+        if(parties.all !== undefined) io.sockets.emit('users.update.view', response.body);
+        else if(parties.group !== undefined) {
+          socket.emit('users.update.view', response.body);
+          socket.broadcast.to(parties.group).emit('users.update.view', response.body);
+        }
+        else if(parties.user !== undefined){
+          for(var key in clients){
+            if(clients[key].user.username == parties.user){
+              clients[key].emit('users.update.view', response.body);
+              break;
+            }
+          }
+        }
+      }
+    });
+  });
 });

@@ -14,21 +14,10 @@ angular.module("backgammonApp")
       		$http(config)
       		.then(function onSuccess(response) {
       			if(response.status == 201){
-      				$rootScope.isAuthenticated = true;
       				$rootScope.credentials = {username:JSON.parse(response.data).userName, password:JSON.parse(response.data).password};
-      				auth.loginNonHttp(JSON.parse(response.data));
-      				console.log("Navigating to lobby");
+              auth.loginNonHttp(JSON.parse(response.data));
               $rootScope.socket.emit('auth', $rootScope.credentials);
-      				$location.url("/lobby");
-      				$rootScope.socket.emit('room.join', 'lobby');
-              return "created";
-      			}
-      			else if(response.status == 200){
-              return "This User already exists in system, try to do LogIn..."
-      			}
-      			else if(response.status == 500){
-      				console.log("Registeration failure");
-              return "Failed to do registration."
+              $rootScope.socket.emit('users.update', {'user':$rootScope.credentials.username});
       			}
       		},
       		function onError(response) {

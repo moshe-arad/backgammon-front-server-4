@@ -1,7 +1,7 @@
 angular.module("backgammonApp")
 	.controller("HomeCtrl",
-		['$scope', '$interval','NewUserValidationService', 'UsersHttpService', '$rootScope', 'SocketioHome',
-			function($scope, $interval, newUserValidationService, usersHttpService, $rootScope, SocketioHome){
+		['$scope', '$interval','NewUserValidationService', 'UsersHttpService', '$rootScope', 'SocketioHome', '$location',
+			function($scope, $interval, newUserValidationService, usersHttpService, $rootScope, SocketioHome, $location){
 
 	$scope.user = {};
 	$scope.register_error = false;
@@ -15,6 +15,24 @@ angular.module("backgammonApp")
 	$scope.userNameAvailable = false;
 	$scope.emailMessage = "";
 
+	$rootScope.socket.on('users.update.view', (data) => {
+		var usersLoggedIn = JSON.parse(data).usersViewChanges.usersLoggedIn;
+
+		console.log(usersLoggedIn);
+
+		if(angular.isDefined(usersLoggedIn) == true){
+			for(var i=0; i<usersLoggedIn.length; i++){
+				if(usersLoggedIn[i].userName == $rootScope.credentials.username){
+					console.log("Navigating to lobby");
+					$rootScope.socket.emit('room.join', 'lobby');
+					$rootScope.isAuthenticated = true;
+					$location.path("/lobby");
+					$scope.$apply();
+				}
+			}
+		}
+	});
+
 	$scope.register = () => {
 		console.log(isPassedValidation());
 		if(isPassedValidation() == "valid") submitForm();
@@ -23,8 +41,7 @@ angular.module("backgammonApp")
 
 	var submitForm = () => {
 		console.log("submitting form...");
-		var result = usersHttpService.createNewUser($scope.user);
-		if(result != "created") $scope.register_error = result;
+		usersHttpService.createNewUser($scope.user);
 	}
 
 	var isPassedValidation = () => {
