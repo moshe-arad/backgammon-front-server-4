@@ -1,19 +1,18 @@
 angular.module("backgammonApp").controller("BoardCtrl", ['$scope', '$http', 'Auth', '$routeParams','$rootScope', '$route', '$location',
 function($scope, $http, Auth, $routeParams, $rootScope, $route, $location){
 
-  $route.routes["/white/:roomName"].permissions.push($routeParams.roomName)
+  // $route.routes["/white/:roomName"].permissions.push($routeParams.roomName)
 
-  console.log($route);
+  var authorizeUser = function(){
+    if(Auth.userHasPermission([$routeParams.roomName]) == false) {
+      $rootScope.credentials = {};
+      $rootScope.isAuthenticated = false;
+      console.log("You are not authorized...");
+      $location.path("/error")
+    }
+    else console.log("WELCOME...");
+  }
 
-  // var authorizeUser = function(){
-  //   if(Auth.userHasPermission([$routeParams.roomName]) == false) {
-  //     $rootScope.credentials = {};
-  //     $rootScope.isAuthenticated = false;
-  //     console.log("You are not authorized...");
-  //     $location.path("/error")
-  //   }
-  // }
-
-  // authorizeUser();
+  authorizeUser();
 
 }]);

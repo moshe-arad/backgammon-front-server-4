@@ -118,7 +118,7 @@ io.on('connection', (socket) => {
     if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
     else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
     else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
-    else options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':'none'} };
+    else return;
 
     request.get('http://localhost:8080/lobby/update/view', options, function(error, response){
       if(typeof error !== 'undefined' && error){
@@ -152,7 +152,7 @@ io.on('connection', (socket) => {
     if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
     else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
     else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
-    else options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':'none'} };
+    else return;
 
     request.get('http://localhost:8080/users/update/view', options, function(error, response){
       if(typeof error !== 'undefined' && error){

@@ -20,8 +20,7 @@ angular.module("backgammonApp")
                   $rootScope.isAuthenticated = true;
                   $rootScope.error = false;
                   $rootScope.socket.emit('auth', $rootScope.credentials);
-                  $location.path("/lobby");
-                  $rootScope.socket.emit('room.join', 'lobby');
+                  $rootScope.socket.emit('users.update', {'user':$rootScope.credentials.username});
               }, function() {
                 console.log("User not found...");
       	         $rootScope.isAuthenticated = false;

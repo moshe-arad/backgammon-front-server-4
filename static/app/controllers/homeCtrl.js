@@ -1,7 +1,7 @@
 angular.module("backgammonApp")
 	.controller("HomeCtrl",
-		['$scope', '$interval','NewUserValidationService', 'UsersHttpService', '$rootScope', 'SocketioHome', '$location',
-			function($scope, $interval, newUserValidationService, usersHttpService, $rootScope, SocketioHome, $location){
+		['$scope', '$interval','NewUserValidationService', 'UsersHttpService', '$rootScope', 'SocketioHome', '$location', 'Auth',
+			function($scope, $interval, newUserValidationService, usersHttpService, $rootScope, SocketioHome, $location, auth){
 
 	$scope.user = {};
 	$scope.register_error = false;
@@ -17,16 +17,26 @@ angular.module("backgammonApp")
 
 	$rootScope.socket.on('users.update.view', (data) => {
 		var usersLoggedIn = JSON.parse(data).usersViewChanges.usersLoggedIn;
-
-		console.log(usersLoggedIn);
+		var usersPermissionsUpdated = JSON.parse(data).usersViewChanges.usersPermissionsUpdated;
 
 		if(angular.isDefined(usersLoggedIn) == true){
 			for(var i=0; i<usersLoggedIn.length; i++){
 				if(usersLoggedIn[i].userName == $rootScope.credentials.username){
 					console.log("Navigating to lobby");
+					auth.loginNonHttp(usersLoggedIn[i]);
 					$rootScope.socket.emit('room.join', 'lobby');
 					$rootScope.isAuthenticated = true;
 					$location.path("/lobby");
+					$scope.$apply();
+				}
+			}
+		}
+
+		if(angular.isDefined(usersPermissionsUpdated) == true){
+			for(var i=0; i<usersPermissionsUpdated.length; i++){
+				if(usersPermissionsUpdated[i].userName == $rootScope.credentials.username){
+					console.log("Navigating to lobby");
+					auth.loginNonHttp(usersPermissionsUpdated[i]);
 					$scope.$apply();
 				}
 			}

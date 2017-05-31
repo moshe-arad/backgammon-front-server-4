@@ -90,7 +90,6 @@ angular.module("backgammonApp")
             return $sessionStorage.user;
         };
 
-
         auth.isLoggedIn = function(){
             return $sessionStorage.user != null;
         };

@@ -47,7 +47,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
-		// var gameRoomsAddPerUser = JSON.parse(data).gameRoomsAddPerUser;
 		var addWatchers = JSON.parse(data).addWatchers;
 		var addSecondPlayers = JSON.parse(data).addSecondPlayer
 
@@ -107,10 +106,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				$scope.rooms = temp;
 				if(gameRoomsAdd[i].openBy == Auth.currentUser().userName){
 					$scope.isOpenRoom = true;
+					$rootScope.socket.emit('room.join', gameRoomsAdd[i].name);
 					$location.url("/white/" + gameRoomsAdd[i].name);
 				}
-
-				$scope.$apply();
 			}
 		}
 	});
@@ -120,6 +118,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		.then((response) => {
 			if(response.status == 201) {
 				$rootScope.socket.emit('lobby.update', {'group':'lobby'});
+				$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
 				console.log("Lobby Update Sent..")
 			}
 			else{

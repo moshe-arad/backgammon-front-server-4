@@ -15,7 +15,6 @@ angular.module("backgammonApp")
       		.then(function onSuccess(response) {
       			if(response.status == 201){
       				$rootScope.credentials = {username:JSON.parse(response.data).userName, password:JSON.parse(response.data).password};
-              auth.loginNonHttp(JSON.parse(response.data));
               $rootScope.socket.emit('auth', $rootScope.credentials);
               $rootScope.socket.emit('users.update', {'user':$rootScope.credentials.username});
       			}
