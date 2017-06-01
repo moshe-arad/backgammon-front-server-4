@@ -56,7 +56,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 			for(var i=0; i<addSecondPlayers.length; i++){
 				var gameRoom = findGameRoomByName(addSecondPlayers[i].gameRoomName);
 				gameRoom.secondPlayer = addSecondPlayers[i].secondPlayer;
-				$scope.$apply();
 
 				if(addSecondPlayers[i].secondPlayer == Auth.currentUser().userName){
 					$location.url("/black/" + addSecondPlayers[i].gameRoomName);
@@ -85,8 +84,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				if(addWatchers[i].watcher == Auth.currentUser().userName){
 					$location.url("/white/" + addWatchers[i].gameRoomName);
 				}
-
-				// $scope.$apply();
 			}
 		}
 
@@ -144,6 +141,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		lobbyHttpService.joinGame(selectedGameRoomName)
 		.then((response) => {
 			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
+			$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
 		}, (response) => {
 				$scope.register_error = response;
 		});
