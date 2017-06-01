@@ -86,7 +86,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 					$location.url("/white/" + addWatchers[i].gameRoomName);
 				}
 
-				$scope.$apply();
+				// $scope.$apply();
 			}
 		}
 
@@ -134,6 +134,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		lobbyHttpService.watchGame(selectedGameRoomName)
 		.then((response) => {
 			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
+			$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
 		}, (response) => {
 				$scope.register_error = response;
 		});

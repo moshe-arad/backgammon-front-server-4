@@ -35,7 +35,7 @@ angular.module("backgammonApp")
 		if(angular.isDefined(usersPermissionsUpdated) == true){
 			for(var i=0; i<usersPermissionsUpdated.length; i++){
 				if(usersPermissionsUpdated[i].userName == $rootScope.credentials.username){
-					console.log("Navigating to lobby");
+					console.log("Users Permissions Updated");
 					auth.loginNonHttp(usersPermissionsUpdated[i]);
 					$scope.$apply();
 				}
