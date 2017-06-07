@@ -47,6 +47,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
+		var gameRoomsUpdate = JSON.parse(data).gameRoomsUpdate;
 		var addWatchers = JSON.parse(data).addWatchers;
 		var addSecondPlayers = JSON.parse(data).addSecondPlayer
 
@@ -108,15 +109,21 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				}
 			}
 		}
+
+		if(angular.isDefined(gameRoomsUpdate) == true){
+			for(var i=0; i<gameRoomsUpdate.length; i++){
+				$scope.rooms = updateGameRoom(gameRoomsUpdate[i]);
+			}
+		}
+
 	});
 
 	$scope.openNewGameRoom = () => {
 		lobbyHttpService.openNewGameRoom()
 		.then((response) => {
 			if(response.status == 201) {
-				$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 				$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
-				console.log("Lobby Update Sent..")
+				// console.log("Lobby Update Sent..")
 			}
 			else{
 				console.log("Failed to open new game room...")
