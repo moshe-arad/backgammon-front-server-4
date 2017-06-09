@@ -106,6 +106,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 					$scope.isOpenRoom = true;
 					$rootScope.socket.emit('room.join', gameRoomsAdd[i].name);
 					$location.url("/white/" + gameRoomsAdd[i].name);
+					$scope.$apply();
 				}
 			}
 		}

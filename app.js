@@ -175,6 +175,7 @@ io.on('connection', (socket) => {
             console.log(clients[key].user)
             console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             if(clients[key].user.username == parties.user){
+              console.log("$$$$$$$$$$$$$$$$$$ sent $$$$$$$$$$$$$$$$$$$$ to " + parties.user)
               clients[key].emit('users.update.view', response.body);
               break;
             }
