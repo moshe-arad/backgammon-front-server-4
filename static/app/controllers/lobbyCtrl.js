@@ -138,7 +138,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.watchGame = () => {
 		lobbyHttpService.watchGame(selectedGameRoomName)
 		.then((response) => {
-			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 			$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
 		}, (response) => {
 				$scope.register_error = response;
