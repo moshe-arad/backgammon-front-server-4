@@ -1,7 +1,7 @@
 angular.module("backgammonApp").controller("LobbyCtrl",
 ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope',
-'$parse', '$location', 'LobbyHttpService', '$route',
-function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobbyHttpService){
+'$parse', '$location', 'LobbyHttpService', '$interval',
+function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobbyHttpService, $interval){
 	$scope.rooms = VirtualLobby.virtualGameRooms().reverse();
 	$scope.users = VirtualLobby.usersInLobby;
 
@@ -11,6 +11,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.isMadeSelection = false;
 
 	var selectedGameRoomName;
+	var roomName;
+	var promise;
 
 	var createRoomModels = () => {
 		var rooms = $scope.rooms;
@@ -59,7 +61,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				gameRoom.secondPlayer = addSecondPlayers[i].secondPlayer;
 
 				if(addSecondPlayers[i].secondPlayer == Auth.currentUser().userName){
-					$location.url("/black/" + addSecondPlayers[i].gameRoomName);
+					roomName = addSecondPlayers[i].gameRoomName;
+					promise = $interval(goToBlackBoard, 50);
 				}
 
 			}
@@ -83,7 +86,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				$scope.rooms = updateGameRoom(gameRoom);
 
 				if(addWatchers[i].watcher == Auth.currentUser().userName){
-					$location.url("/white/" + addWatchers[i].gameRoomName);
+					roomName = addWatchers[i].gameRoomName;
+					promise = $interval(goToWhiteBoard, 50);
 				}
 			}
 		}
@@ -105,8 +109,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				if(gameRoomsAdd[i].openBy == Auth.currentUser().userName){
 					$scope.isOpenRoom = true;
 					$rootScope.socket.emit('room.join', gameRoomsAdd[i].name);
-					$location.url("/white/" + gameRoomsAdd[i].name);
-					$scope.$apply();
+					roomName = gameRoomsAdd[i].name;
+					promise = $interval(goToWhiteBoard, 50);
 				}
 			}
 		}
@@ -118,6 +122,20 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		}
 
 	});
+
+	var goToWhiteBoard = () => {
+		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$location.url("/white/" + roomName);
+			$interval.cancel(promise);
+		}
+	}
+
+	var goToBlackBoard = () => {
+		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$location.url("/black/" + roomName);
+			$interval.cancel(promise);
+		}
+	}
 
 	$scope.openNewGameRoom = () => {
 		lobbyHttpService.openNewGameRoom()

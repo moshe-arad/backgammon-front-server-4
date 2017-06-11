@@ -167,15 +167,8 @@ io.on('connection', (socket) => {
           socket.broadcast.to(parties.group).emit('users.update.view', response.body);
         }
         else if(parties.user !== undefined){
-          console.log("*****************************")
-          console.log(clients)
-          console.log("*****************************")
           for(var key in clients){
-            console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            console.log(clients[key].user)
-            console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             if(clients[key].user.username == parties.user){
-              console.log("$$$$$$$$$$$$$$$$$$ sent $$$$$$$$$$$$$$$$$$$$ to " + parties.user)
               clients[key].emit('users.update.view', response.body);
               break;
             }
