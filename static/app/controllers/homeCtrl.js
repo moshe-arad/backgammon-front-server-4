@@ -19,6 +19,8 @@ angular.module("backgammonApp")
 		var usersLoggedIn = JSON.parse(data).usersViewChanges.usersLoggedIn;
 		var usersPermissionsUpdated = JSON.parse(data).usersViewChanges.usersPermissionsUpdated;
 
+		console.log("users.update.view")
+		
 		if(angular.isDefined(usersLoggedIn) == true){
 			for(var i=0; i<usersLoggedIn.length; i++){
 				console.log($rootScope.credentials.username)
