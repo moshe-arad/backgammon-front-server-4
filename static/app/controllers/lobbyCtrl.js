@@ -52,6 +52,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var gameRoomsUpdate = JSON.parse(data).gameRoomsUpdate;
 		var addWatchers = JSON.parse(data).addWatchers;
 		var addSecondPlayers = JSON.parse(data).addSecondPlayer
+		var leavingPlayers = JSON.parse(data).leavingPlayers
 
 		console.log("*** Update view message accepted ***");
 
@@ -123,6 +124,14 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 			}
 		}
 
+		if(angular.isDefined(leavingPlayers) == true){
+			for(var i=0; i<leavingPlayers.length; i++){
+				if(leavingPlayers[i] == Auth.currentUser().userName){
+					$location.url('/lobby');
+					$scope.$apply();
+				}
+			}
+		}
 	});
 
 	var goToWhiteBoard = () => {
