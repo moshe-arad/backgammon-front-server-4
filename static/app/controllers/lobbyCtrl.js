@@ -72,6 +72,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 			for(var i=0; i<roomsToDelete.length; i++){
 				var temp = $scope.rooms;
 				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+				$location.path("/lobby");
 				$scope.$apply();
 			}
 		}
@@ -106,6 +107,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				var temp = $scope.rooms;
 				temp.push(gameRoomsAdd[i])
 				$scope.rooms = temp;
+				$scope.$apply();
 				if(gameRoomsAdd[i].openBy == Auth.currentUser().userName){
 					$scope.isOpenRoom = true;
 					$rootScope.socket.emit('room.join', gameRoomsAdd[i].name);
