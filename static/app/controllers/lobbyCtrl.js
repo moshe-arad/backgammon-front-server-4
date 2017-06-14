@@ -73,8 +73,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 			for(var i=0; i<roomsToDelete.length; i++){
 				var temp = $scope.rooms;
 				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
-				$location.path("/lobby");
-				$scope.$apply();
+				$rootScope.$apply(function() {
+					$location.path("/lobby");
+				});
 			}
 		}
 
@@ -127,8 +128,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		if(angular.isDefined(leavingPlayers) == true){
 			for(var i=0; i<leavingPlayers.length; i++){
 				if(leavingPlayers[i] == Auth.currentUser().userName){
-					$location.url('/lobby');
-					$scope.$apply();
+					$rootScope.$apply(function() {
+        		$location.path("/lobby");
+      		});
 				}
 			}
 		}
