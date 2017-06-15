@@ -74,6 +74,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				var temp = $scope.rooms;
 				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
 				$rootScope.$apply(function() {
+					$rootScope.socket.emit('room.leave', roomsToDelete[i]);
+					$rootScope.socket.emit('room.join', 'lobby');
 					$location.path("/lobby");
 				});
 			}
@@ -123,12 +125,15 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 			for(var i=0; i<gameRoomsUpdate.length; i++){
 				$scope.rooms = updateGameRoom(gameRoomsUpdate[i]);
 			}
+			$scope.$apply();
 		}
 
 		if(angular.isDefined(leavingPlayers) == true){
 			for(var i=0; i<leavingPlayers.length; i++){
 				if(leavingPlayers[i] == Auth.currentUser().userName){
 					$rootScope.$apply(function() {
+						$rootScope.socket.emit('room.leave', roomName);
+						$rootScope.socket.emit('room.join', 'lobby');
         		$location.path("/lobby");
       		});
 				}
@@ -138,6 +143,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 
 	var goToWhiteBoard = () => {
 		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$rootScope.socket.emit('room.leave', 'lobby');
 			$location.url("/white/" + roomName);
 			$interval.cancel(promise);
 		}
@@ -145,6 +151,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 
 	var goToBlackBoard = () => {
 		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$rootScope.socket.emit('room.leave', 'lobby');
 			$location.url("/black/" + roomName);
 			$interval.cancel(promise);
 		}
