@@ -23,9 +23,9 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
 
     $http(config).then(function onSuccess(response){
       console.log("User left game room response accepted...");
+      $rootScope.socket.emit('room.leave', $routeParams.roomName);
+      $rootScope.socket.emit('room.join', 'lobby');
       $rootScope.socket.emit('users.update', {'user':auth.currentUser().userName});
-      // $location.path("/lobby");
-      // $scope.$apply();
     }, function onError(response){
         console.log("An error occured while trying to open a new game room..." + "Status code = " + response.status + ", text = " + response.statusText);
     });

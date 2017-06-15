@@ -71,12 +71,13 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 
 		if(angular.isDefined(roomsToDelete) == true){
 			for(var i=0; i<roomsToDelete.length; i++){
-				var temp = $scope.rooms;
-				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+				// $rootScope.socket.emit('room.leave', roomsToDelete[i]);
+				// $rootScope.socket.emit('room.join', 'lobby');
 				$rootScope.$apply(function() {
-					$rootScope.socket.emit('room.leave', roomsToDelete[i]);
-					$rootScope.socket.emit('room.join', 'lobby');
+					var temp = $scope.rooms;
+					$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
 					$location.path("/lobby");
+					console,log("************************* hit")
 				});
 			}
 		}
@@ -131,9 +132,9 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		if(angular.isDefined(leavingPlayers) == true){
 			for(var i=0; i<leavingPlayers.length; i++){
 				if(leavingPlayers[i] == Auth.currentUser().userName){
+					// $rootScope.socket.emit('room.leave', roomName);
+					// $rootScope.socket.emit('room.join', 'lobby');
 					$rootScope.$apply(function() {
-						$rootScope.socket.emit('room.leave', roomName);
-						$rootScope.socket.emit('room.join', 'lobby');
         		$location.path("/lobby");
       		});
 				}
