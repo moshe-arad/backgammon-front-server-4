@@ -1,7 +1,7 @@
 angular.module("backgammonApp").controller("LobbyCtrl",
 ['$scope', '$http', 'VirtualLobby', 'Auth', '$rootScope',
-'$parse', '$location', 'LobbyHttpService', '$route',
-function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobbyHttpService){
+'$parse', '$location', 'LobbyHttpService', '$interval',
+function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobbyHttpService, $interval){
 	$scope.rooms = VirtualLobby.virtualGameRooms().reverse();
 	$scope.users = VirtualLobby.usersInLobby;
 
@@ -11,6 +11,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.isMadeSelection = false;
 
 	var selectedGameRoomName;
+	var roomName;
+	var promise;
 
 	var createRoomModels = () => {
 		var rooms = $scope.rooms;
@@ -47,8 +49,10 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		var roomsToDelete = JSON.parse(data).gameRoomsDelete;
 		var watchersToDelete = JSON.parse(data).deleteWatchers;
 		var gameRoomsAdd = JSON.parse(data).gameRoomsAdd;
+		var gameRoomsUpdate = JSON.parse(data).gameRoomsUpdate;
 		var addWatchers = JSON.parse(data).addWatchers;
 		var addSecondPlayers = JSON.parse(data).addSecondPlayer
+		var leavingPlayers = JSON.parse(data).leavingPlayers
 
 		console.log("*** Update view message accepted ***");
 
@@ -58,7 +62,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				gameRoom.secondPlayer = addSecondPlayers[i].secondPlayer;
 
 				if(addSecondPlayers[i].secondPlayer == Auth.currentUser().userName){
-					$location.url("/black/" + addSecondPlayers[i].gameRoomName);
+					roomName = addSecondPlayers[i].gameRoomName;
+					promise = $interval(goToBlackBoard, 50);
 				}
 
 			}
@@ -66,9 +71,14 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 
 		if(angular.isDefined(roomsToDelete) == true){
 			for(var i=0; i<roomsToDelete.length; i++){
-				var temp = $scope.rooms;
-				$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
-				$scope.$apply();
+				// $rootScope.socket.emit('room.leave', roomsToDelete[i]);
+				// $rootScope.socket.emit('room.join', 'lobby');
+				$rootScope.$apply(function() {
+					var temp = $scope.rooms;
+					$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
+					$location.path("/lobby");
+					console,log("************************* hit")
+				});
 			}
 		}
 
@@ -82,7 +92,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				$scope.rooms = updateGameRoom(gameRoom);
 
 				if(addWatchers[i].watcher == Auth.currentUser().userName){
-					$location.url("/white/" + addWatchers[i].gameRoomName);
+					roomName = addWatchers[i].gameRoomName;
+					promise = $interval(goToWhiteBoard, 50);
 				}
 			}
 		}
@@ -101,22 +112,58 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				var temp = $scope.rooms;
 				temp.push(gameRoomsAdd[i])
 				$scope.rooms = temp;
+				$scope.$apply();
 				if(gameRoomsAdd[i].openBy == Auth.currentUser().userName){
 					$scope.isOpenRoom = true;
 					$rootScope.socket.emit('room.join', gameRoomsAdd[i].name);
-					$location.url("/white/" + gameRoomsAdd[i].name);
+					roomName = gameRoomsAdd[i].name;
+					promise = $interval(goToWhiteBoard, 50);
+				}
+			}
+		}
+
+		if(angular.isDefined(gameRoomsUpdate) == true){
+			for(var i=0; i<gameRoomsUpdate.length; i++){
+				$scope.rooms = updateGameRoom(gameRoomsUpdate[i]);
+			}
+			$scope.$apply();
+		}
+
+		if(angular.isDefined(leavingPlayers) == true){
+			for(var i=0; i<leavingPlayers.length; i++){
+				if(leavingPlayers[i] == Auth.currentUser().userName){
+					// $rootScope.socket.emit('room.leave', roomName);
+					// $rootScope.socket.emit('room.join', 'lobby');
+					$rootScope.$apply(function() {
+        		$location.path("/lobby");
+      		});
 				}
 			}
 		}
 	});
 
+	var goToWhiteBoard = () => {
+		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$rootScope.socket.emit('room.leave', 'lobby');
+			$location.url("/white/" + roomName);
+			$interval.cancel(promise);
+		}
+	}
+
+	var goToBlackBoard = () => {
+		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$rootScope.socket.emit('room.leave', 'lobby');
+			$location.url("/black/" + roomName);
+			$interval.cancel(promise);
+		}
+	}
+
 	$scope.openNewGameRoom = () => {
 		lobbyHttpService.openNewGameRoom()
 		.then((response) => {
 			if(response.status == 201) {
-				$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 				$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
-				console.log("Lobby Update Sent..")
+				// console.log("Lobby Update Sent..")
 			}
 			else{
 				console.log("Failed to open new game room...")
@@ -130,7 +177,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.watchGame = () => {
 		lobbyHttpService.watchGame(selectedGameRoomName)
 		.then((response) => {
-			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 			$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
 		}, (response) => {
 				$scope.register_error = response;
@@ -140,7 +186,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.joinGame = () => {
 		lobbyHttpService.joinGame(selectedGameRoomName)
 		.then((response) => {
-			$rootScope.socket.emit('lobby.update', {'group':'lobby'});
 			$rootScope.socket.emit('users.update', {'user':Auth.currentUser().userName});
 		}, (response) => {
 				$scope.register_error = response;

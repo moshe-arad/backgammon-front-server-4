@@ -169,6 +169,7 @@ io.on('connection', (socket) => {
         else if(parties.user !== undefined){
           for(var key in clients){
             if(clients[key].user.username == parties.user){
+              console.log(clients[key].user.username + " **************** sent")
               clients[key].emit('users.update.view', response.body);
               break;
             }
