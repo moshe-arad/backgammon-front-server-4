@@ -4,6 +4,12 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   $route.routes["/white/:roomName"].permissions.push($routeParams.roomName)
   $route.routes["/black/:roomName"].permissions.push($routeParams.roomName)
 
+  $scope.messageWhite = "";
+  $scope.messageBlack = "";
+
+  var blackPath = "/black/" + $routeParams.roomName;
+  var whitePath = "/white/" + $routeParams.roomName;
+
   var authorizeUser = function(){
     if(auth.userHasPermission([$routeParams.roomName]) == false) {
       $rootScope.credentials = {};
@@ -14,7 +20,36 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     else console.log("WELCOME...");
   }
 
-  authorizeUser();
+  var init = () => {
+    authorizeUser();
+    if($location.path() == blackPath) {
+        console.log("**************************** hit")
+        $rootScope.socket.emit('game.update', {'group':$routeParams.roomName});
+    }
+  }
+
+  init();
+
+  $rootScope.socket.on('game.update.view', (data) => {
+
+		var messageToWhite = JSON.parse(data).messageToWhite;
+		var messageToBlack = JSON.parse(data).messageToBlack;
+
+      console.log($route);
+
+		if($location.path() == whitePath && angular.isDefined(messageToWhite) == true){
+      console.log("**************************** hit white")
+      $scope.messageWhite = messageToWhite;
+      $scope.$apply();
+		}
+
+    if($location.path() == blackPath && angular.isDefined(messageToBlack) == true){
+      console.log("**************************** hit black")
+      $scope.messageBlack = messageToBlack;
+      $scope.$apply();
+		}
+
+	});
 
   $scope.leaveGameRoom = () => {
     console.log("Will try to leave game room...")
