@@ -38,14 +38,13 @@ angular.module("backgammonApp")
       }
 
 		  $http(config).then(function (response) {
-        Auth.logout();
-		    $rootScope.isAuthenticated = false;
 		    $location.path("/");
 		    $rootScope.logoutSuccess = true;
         $rootScope.credentials = {};
+        Auth.logout();
         $rootScope.socket.emit('room.leave', 'lobby');
         $rootScope.socket.emit('lobby.update', {'group':'lobby'});
-
+        $rootScope.isAuthenticated = false;
 		  },function(response) {
 		    $rootScope.authenticated = false;
 		  });

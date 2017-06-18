@@ -78,7 +78,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 					var temp = $scope.rooms;
 					$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
 					$location.path("/lobby");
-					console,log("************************* hit")
 				});
 			}
 		}

@@ -24,6 +24,10 @@ app.use(authRouter);
 var lobbyRouter = require("./routers/lobby");
 app.use(lobbyRouter);
 
+//game route
+var gameRouter = require("./routers/game");
+app.use(gameRouter);
+
 var server = app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 });
@@ -39,6 +43,23 @@ io.on('connection', (socket) => {
 
   socket.on("disconnect", function() {
     if(this.user !== undefined){
+
+      var headers = { 'Content-Type':'application/json' }
+
+      var options = {
+          method:'PUT',
+          headers:headers,
+          body:JSON.stringify({"username":this.user.username, "password":this.user.password})
+      }
+
+      request.put('http://localhost:8080/users/logout', options, (error, response, body) => {
+        if(typeof error !== 'undefined' && error) console.log("Error as occured, error = " + error);
+        else{
+          console.log("Response of Logout request accepted successfuly...");
+        }
+      });
+
+      socket.emit('lobby.update', {'group':'lobby'});
       console.log(this.user.username + " was disconnected...") // prints: foobar
       delete clients[this.client_id];
     }
