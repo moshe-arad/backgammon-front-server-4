@@ -62,6 +62,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 				gameRoom.secondPlayer = addSecondPlayers[i].secondPlayer;
 
 				if(addSecondPlayers[i].secondPlayer == Auth.currentUser().userName){
+					$rootScope.socket.emit('room.join', addSecondPlayers[i].gameRoomName);
 					roomName = addSecondPlayers[i].gameRoomName;
 					promise = $interval(goToBlackBoard, 50);
 				}
@@ -77,7 +78,6 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 					var temp = $scope.rooms;
 					$scope.rooms = removeRoomByName(temp, roomsToDelete[i]);
 					$location.path("/lobby");
-					console,log("************************* hit")
 				});
 			}
 		}
