@@ -184,12 +184,14 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     fromColumn = "";
     toColumn = "";
 
+    isCanSelectMove = false;
+
     $scope.disableWhitePlayMove = true;
     $scope.disableBlackPlayMove = true;
 
     $scope.disableWhiteCancelMove = true;
     $scope.disableBlackCancelMove = true;
-    
+
     console.log("Will try to play a move...")
     var headers = { 'Content-Type':'application/json', 'Accept':'application/json' }
     var config = { method:'POST', url:'http://localhost:3000/game/move', headers:headers,
