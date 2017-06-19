@@ -1,10 +1,16 @@
 angular.module("backgammonApp")
     .controller('HeaderCtrl',
-    ['$rootScope', '$location', '$http', 'Auth',
-    function ($rootScope, $location, $http, Auth) {
+    ['$rootScope', '$location', '$http', 'Auth','$scope',
+    function ($rootScope, $location, $http, Auth, $scope) {
 
-    $rootScope.credentials = {};
-		$rootScope.isAuthenticated = false;
+    if(Auth.isLoggedIn()){
+      $rootScope.credentials = {username: Auth.currentUser().userName, password: Auth.currentUser().password};
+  		$rootScope.isAuthenticated = true;
+    }else{
+      $rootScope.credentials = {};
+      $rootScope.isAuthenticated = false;
+    }
+
     $rootScope.error = false;
 
 	  $rootScope.login = function() {
@@ -13,7 +19,8 @@ angular.module("backgammonApp")
                   $rootScope.credentials.username = $rootScope.credentials.username;
                   $rootScope.isAuthenticated = true;
                   $rootScope.error = false;
-                  $location.path("/lobby");
+                  $rootScope.socket.emit('auth', $rootScope.credentials);
+                  $rootScope.socket.emit('users.update', {'user':$rootScope.credentials.username});
               }, function() {
                 console.log("User not found...");
       	         $rootScope.isAuthenticated = false;
@@ -24,21 +31,20 @@ angular.module("backgammonApp")
 	  };
 
 	  $rootScope.logout = function() {
-      var headers = {'Content-Type':'application/json'}
+      var headers = { 'Content-Type':'application/json' }
 
-      var config = {
-        'method':'POST',
-        'url':'http://localhost:3000/logout',
-        'headers':headers,
-        'data':JSON.stringify({'username':$rootScope.credentials.username, 'password':$rootScope.credentials.password})
+      var config = { 'method':'POST', 'url':'http://localhost:3000/logout', 'headers':headers,
+        'data':JSON.stringify({'username':$rootScope.credentials.username, 'password':$rootScope.credentials.password} )
       }
 
 		  $http(config).then(function (response) {
-        Auth.logout();
-		    $rootScope.isAuthenticated = false;
 		    $location.path("/");
 		    $rootScope.logoutSuccess = true;
         $rootScope.credentials = {};
+        Auth.logout();
+        $rootScope.socket.emit('room.leave', 'lobby');
+        $rootScope.socket.emit('lobby.update', {'group':'lobby'});
+        $rootScope.isAuthenticated = false;
 		  },function(response) {
 		    $rootScope.authenticated = false;
 		  });

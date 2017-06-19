@@ -1,7 +1,5 @@
 var express = require('express');
-var passport = require('passport');
 var request = require('request');
-
 var router = express.Router();
 module.exports = router;
 
@@ -11,66 +9,29 @@ router.post('/login', (req, res) => {
     }
 
     var options = {
+        method:'PUT',
         headers:headers,
-        qs:{"username":req.body.username, "password":req.body.password}
+        body:JSON.stringify({"username":req.body.username, "password":req.body.password})
     }
 
-    request.get('http://localhost:8080/users/login', options, (error, response, body) => {
-        if(typeof error !== 'undefined' && error){
-            console.log("Error as occured, error = " + error);
-        }
-        else{
-            if(typeof body !== 'undefined' && body){
-                if(JSON.parse(body).isUserFound == true){
-                    console.log("User found...");
-                    res.json(JSON.parse(body).backgammonUser)
-                    res.status(200);
-                    res.end();
-                }
-                else if(JSON.parse(body).isUserFound == false){
-                    console.log("User not found...");
-                    res.status(401);
-                    res.end();
-                }
-            }
-            else {
-                console.log("Error occured reading body, while trying to authenticate user...");
-            }
-        }
+    request.put('http://localhost:8080/users/login', options, (error, response, body) => {
+      if(typeof error !== 'undefined' && error) console.log("Error as occured, error = " + error);
+      else res.status(response.statusCode).end();
     });
 });
 
 router.post('/logout', (req, res) => {
-  var headers = {
-      'Content-Type':'application/json'
-  }
+  var headers = { 'Content-Type':'application/json' }
 
   var options = {
+      method:'PUT',
       headers:headers,
-      qs:{"username":req.body.username, "password":req.body.password}
+      body:JSON.stringify({"username":req.body.username, "password":req.body.password})
   }
 
-  request.get('http://localhost:8080/users/logout', options, (error, response, body) => {
-    if(typeof error !== 'undefined' && error){
-      console.log("Error as occured, error = " + error);
-    }
-    else{
-      if(typeof body !== 'undefined' && body){
-        if(JSON.parse(body).isUserFound == true){
-          console.log("User found, and logged out...");
-          res.status(200);
-          res.end();
-        }
-        else if(JSON.parse(body).isUserFound == false){
-          console.log("User not found, did not logged out...");
-          res.status(500);
-          res.end();
-        }
-      }
-      else {
-        console.log("Error occured reading body, while trying to authenticate user...");
-      }
-    }
+  request.put('http://localhost:8080/users/logout', options, (error, response, body) => {
+    if(typeof error !== 'undefined' && error) console.log("Error as occured, error = " + error);
+    else res.status(response.statusCode).end();
   });
 });
 

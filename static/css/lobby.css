@@ -1,3 +1,8 @@
+html,
+body{
+    height:100% !important;
+}
+
 #title{
 	letter-spacing: 3px;
 	word-spacing: 10px;
@@ -8,4 +13,9 @@
 td,th{
 	padding-right: 20px !important;
 	padding-left: 20px !important;
+}
+
+td{
+  border-right-style:none !important;
+  border-left-style:none !important;
 }

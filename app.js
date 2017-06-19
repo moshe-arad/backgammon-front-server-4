@@ -20,6 +20,14 @@ app.get('/favicon.ico', function(req, res) {
 var authRouter = require("./routers/auth");
 app.use(authRouter);
 
+//lobby route
+var lobbyRouter = require("./routers/lobby");
+app.use(lobbyRouter);
+
+//game route
+var gameRouter = require("./routers/game");
+app.use(gameRouter);
+
 var server = app.listen(3000, function () {
   console.log('Example app listening on port 3000!')
 });
@@ -28,16 +36,201 @@ var server = app.listen(3000, function () {
 //socket io
 var io = socketio(server);
 
+var clients = {};
+var client_id = 0;
+
 io.on('connection', (socket) => {
+
+  socket.on("disconnect", function() {
+    if(this.user !== undefined){
+
+      var headers = { 'Content-Type':'application/json' }
+
+      var options = {
+          method:'PUT',
+          headers:headers,
+          body:JSON.stringify({"username":this.user.username, "password":this.user.password})
+      }
+
+      request.put('http://localhost:8080/users/logout', options, (error, response, body) => {
+        if(typeof error !== 'undefined' && error) console.log("Error as occured, error = " + error);
+        else{
+          console.log("Response of Logout request accepted successfuly...");
+        }
+      });
+
+      socket.emit('lobby.update', {'group':'lobby'});
+      console.log(this.user.username + " was disconnected...") // prints: foobar
+      delete clients[this.client_id];
+    }
+  });
+
   socket.on('emailCheck', (data) => {
-    request.get('http://localhost:8080/users/email/' + data.email + '/', function(error, response){
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+    var options = { method:'GET', headers:headers };
+
+    request.get('http://localhost:8080/users/email/' + data.email + '/', options, function(error, response){
       socket.emit('emailCheckReply', response);
     });
   });
 
   socket.on('userNameCheck', (data) => {
-    request.get('http://localhost:8080/users/user_name/' + data.userName + '/', function(error, response){
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+
+    var options = { method:'GET', headers:headers };
+
+    request.get('http://localhost:8080/users/user_name/' + data.userName + '/', options, function(error, response){
       socket.emit('userNameCheckReply', response);
+    });
+  });
+
+  socket.on('auth', (user) => {
+    socket.client_id = client_id;
+    socket.user = user;
+    clients[client_id] = socket;
+    client_id++;
+    console.log("User = " + user.username + ", was authenticate.");
+  });
+
+  socket.on('room.join', (room) => {
+    console.log(socket.rooms);
+    socket.join(room);
+    console.log("User joined " + room  + " room.");
+
+    if(typeof io.sockets.adapter.rooms['lobby'] !== 'undefined'){
+      var clients = io.sockets.adapter.rooms['lobby'].sockets;
+
+      console.log("In Lobby Room:");
+
+      for (var client in clients ) {
+        console.log('Username: ' + JSON.stringify(client));
+      }
+    }
+  });
+
+  socket.on('room.leave', (room) => {
+    console.log(socket.rooms);
+    socket.leave(room);
+    console.log("User left " + room  + " room.");
+
+    if(typeof io.sockets.adapter.rooms['lobby'] !== 'undefined'){
+      var clients = io.sockets.adapter.rooms['lobby'].sockets;
+
+      console.log("In Lobby Room:");
+
+      for (var client in clients ) {
+        console.log('Username: ' + JSON.stringify(client));
+      }
+    }
+  });
+
+  socket.on('room.close', (gameRoom) => {
+    socket.broadcast.to('lobby').emit('room.close', gameRoom);
+  });
+
+  socket.on('room.watcher', (data) => {
+    socket.broadcast.to('lobby').emit('room.watcher', data);
+  });
+
+  socket.on('lobby.update', (parties) => {
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+    var options;
+
+    if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
+    else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
+    else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
+    else return;
+
+    request.get('http://localhost:8080/lobby/update/view', options, function(error, response){
+      if(typeof error !== 'undefined' && error){
+          console.log("Error as occured, error = " + error);
+      }
+      else{
+        console.log(response.body)
+        console.log(parties)
+
+        if(parties.all !== undefined) io.sockets.emit('lobby.update.view', response.body);
+        else if(parties.group !== undefined) {
+          socket.emit('lobby.update.view', response.body);
+          socket.broadcast.to(parties.group).emit('lobby.update.view', response.body);
+        }
+        else if(parties.user !== undefined){
+          for(var key in clients){
+            if(clients[key].user.username == parties.user){
+              clients[key].emit('lobby.update.view', response.body);
+              break;
+            }
+          }
+        }
+      }
+    });
+  });
+
+  socket.on('users.update', (parties) => {
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+    var options;
+
+    if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
+    else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
+    else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
+    else return;
+
+    request.get('http://localhost:8080/users/update/view', options, function(error, response){
+      if(typeof error !== 'undefined' && error){
+          console.log("Error as occured, error = " + error);
+      }
+      else{
+        console.log(response.body)
+
+        if(parties.all !== undefined) io.sockets.emit('users.update.view', response.body);
+        else if(parties.group !== undefined) {
+          socket.emit('users.update.view', response.body);
+          socket.broadcast.to(parties.group).emit('users.update.view', response.body);
+        }
+        else if(parties.user !== undefined){
+          for(var key in clients){
+            if(clients[key].user.username == parties.user){
+              console.log(clients[key].user.username + " **************** sent")
+              clients[key].emit('users.update.view', response.body);
+              break;
+            }
+          }
+        }
+      }
+    });
+  });
+
+  socket.on('game.update', (parties) => {
+    var headers = {'Content-Type':'application/json', 'Accept':'application/json'};
+    var options;
+
+    if(typeof parties.all !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'all', 'group':'none', 'user':'none'} };
+    else if(typeof parties.group !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':parties.group, 'user':'none'} };
+    else if(typeof parties.user !== 'undefined') options = { method:'GET', headers:headers, qs:{'all':'none', 'group':'none', 'user':parties.user} };
+    else return;
+
+    request.get('http://localhost:8080/game/update/view', options, function(error, response){
+      if(typeof error !== 'undefined' && error){
+          console.log("Error as occured, error = " + error);
+      }
+      else{
+        console.log(response.body)
+        console.log(parties)
+
+        if(parties.all !== undefined) io.sockets.emit('game.update.view', response.body);
+        else if(parties.group !== undefined) {
+          socket.emit('game.update.view', response.body);
+          socket.broadcast.to(parties.group).emit('game.update.view', response.body);
+        }
+        else if(parties.user !== undefined){
+          for(var key in clients){
+            if(clients[key].user.username == parties.user){
+              clients[key].emit('game.update.view', response.body);
+              break;
+            }
+          }
+        }
+      }
     });
   });
 });

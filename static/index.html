@@ -6,13 +6,13 @@
 		<title>Arad's Backgammon Game</title>
 		<link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
 		<link rel="stylesheet" href='/css/home.css' type="text/css" />
+		<link rel="stylesheet" href='/css/backgammon.css' type="text/css" />
+		<link rel="stylesheet" href='/css/lobby.css' type="text/css" />
 	</head>
 	<body>
 
 		<!-- socket.io -->
 		<script src="/socket.io/socket.io.js"></script>
-
-
 
 		<!-- angular -->
 		<script src="/js/jquery-3.1.1.min.js"></script>
@@ -28,10 +28,16 @@
 		<script src="/app/controllers/homeCtrl.js" ></script>
 		<script src="/app/controllers/headerCtrl.js" ></script>
 		<script src="/app/controllers/lobbyCtrl.js" ></script>
+		<script src="/app/controllers/boardCtrl.js" ></script>
 
 		<!-- services -->
-		<script src="/app/services/AuthServices.js" ></script>
-
+		<script src="/app/services/authService.js" ></script>
+		<script src="/app/services/virtualLobbyService.js" ></script>
+		<script src="/app/services/socketioLobbyService.js" ></script>
+		<script src="/app/services/socketioHomeService.js" ></script>
+		<script src="/app/services/newUserValidationService.js" ></script>
+		<script src="/app/services/usersHttpService.js" ></script>
+		<script src="/app/services/lobbyHttpService.js" ></script>
 
 		<div id="header" ng-include="'/app/partials/header.html'" ng-controller="HeaderCtrl"></div>
 
