@@ -53,6 +53,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     var isToShowRollDiceBtnToBlack = JSON.parse(data).isToShowRollDiceBtnToBlack;
     var isWhiteTurn = JSON.parse(data).isWhiteTurn;
     var isBlackTurn = JSON.parse(data).isBlackTurn;
+    var isToApplyMove = JSON.parse(data).isToApplyMove;
 
     console.log(data);
 
@@ -103,6 +104,22 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
       });
     }
 
+    if(isToApplyMove == false && isWhiteTurn == true && $location.path() == whitePath){
+      $scope.fromColumn = "";
+      $scope.toColumn = "";
+      $scope.disableWhitePlayMove = true;
+      $scope.disableWhiteCancelMove = true;
+      $scope.disableWhitePlayMove = true;
+      isCanSelectMove = true;
+    }
+    else if(isToApplyMove == false && isBlackTurn == true && $location.path() == blackPath){
+      $scope.fromColumn = "";
+      $scope.toColumn = "";
+      $scope.disableWhitePlayMove = true;
+      $scope.disableWhiteCancelMove = true;
+      $scope.disableWhitePlayMove = true;
+      isCanSelectMove = true;
+    }
 	});
 
   $scope.leaveGameRoom = () => {
@@ -149,12 +166,9 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
         }
       }
       else if($scope.toColumn == ""){
-        console.log("************* 1")
         $scope.toColumn = column;
         isCanSelectMove = false;
-        console.log("************* 2 " + column + ", "+ $scope.toColumn)
         if($location.path() == whitePath) {
-          console.log("************* 3")
           $scope.disableWhitePlayMove = false;
           $scope.messageWhite = auth.currentUser().userName + ", You have selected to move pawn to column # " + $scope.toColumn;
           console.log(auth.currentUser().userName + ", You have selected to move pawn to column # " + $scope.toColumn);
