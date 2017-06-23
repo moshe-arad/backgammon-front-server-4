@@ -8,18 +8,18 @@
 	color:brown;
 }
 
-td{
-	border-width: 0px !important;
-	border-right: 1px solid black !important;
-	border-left: 1px solid black !important;
-}
-
 .empty-cell{
-	color: white;
-	opacity: 0.0;
+	color: white !important;
+	opacity: 0.0 !important;
 }
 
 .middle-cell{
 	color: white;
 	border-width: 0px !important;
+}
+
+table.board tr td:not(.middle-cell){
+	border-width: 0px !important;
+	border-right: 1px solid black !important;
+	border-left: 1px solid black !important;
 }

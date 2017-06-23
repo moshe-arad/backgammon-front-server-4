@@ -18,12 +18,13 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   $scope.disableWhiteCancelMove = true;
   $scope.disableBlackCancelMove = true;
 
+  $scope.fromColumn = "";
+  $scope.toColumn = "";
+
   var isMyTurn = false;
   var isCanSelectMove = false;
   var blackPath = "/black/" + $routeParams.roomName;
   var whitePath = "/white/" + $routeParams.roomName;
-  var fromColumn = "";
-  var toColumn = "";
 
   var authorizeUser = function(){
     if(auth.userHasPermission([$routeParams.roomName]) == false) {
@@ -133,47 +134,53 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   };
 
   $scope.pawnSelect = (column) => {
-    console.log("*********** select1");
-    console.log("***********  " + isCanSelectMove);
     if(isCanSelectMove == true){
-      console.log("*********** select2");
-      if(fromColumn == ""){
-        console.log("*********** select3");
-        fromColumn = column;
+      if($scope.fromColumn == ""){
+        $scope.fromColumn = column;
         if($location.path() == whitePath) {
-          console.log("*********** select4");
           $scope.disableWhiteCancelMove = false;
-          $scope.messageWhite = auth.currentUser().userName + ", You have selected to move pawn from column # " + fromColumn;
+          $scope.messageWhite = auth.currentUser().userName + ", You have selected to move pawn from column # " + $scope.fromColumn;
+          console.log(auth.currentUser().userName + ", You have selected to move pawn from column # " + $scope.fromColumn);
         }
         else if($location.path() == blackPath) {
             $scope.disableBlackCancelMove = false;
-            $scope.messageBlack = auth.currentUser().userName + ", You have selected to move pawn from column # " + fromColumn;
+            $scope.messageBlack = auth.currentUser().userName + ", You have selected to move pawn from column # " + $scope.fromColumn;
+            console.log(auth.currentUser().userName + ", You have selected to move pawn from column # " + $scope.fromColumn)
         }
       }
-      else if(toColumn == ""){
-        toColumn == column;
+      else if($scope.toColumn == ""){
+        console.log("************* 1")
+        $scope.toColumn = column;
         isCanSelectMove = false;
+        console.log("************* 2 " + column + ", "+ $scope.toColumn)
         if($location.path() == whitePath) {
+          console.log("************* 3")
           $scope.disableWhitePlayMove = false;
-          $scope.messageWhite = auth.currentUser().userName + ", You have selected to move pawn to column # " + toColumn;
+          $scope.messageWhite = auth.currentUser().userName + ", You have selected to move pawn to column # " + $scope.toColumn;
+          console.log(auth.currentUser().userName + ", You have selected to move pawn to column # " + $scope.toColumn);
         }
         else if($location.path() == blackPath) {
           $scope.disableBlackPlayMove = false;
-          $scope.messageBlack = auth.currentUser().userName + ", You have selected to move pawn to column # " + toColumn;
+          $scope.messageBlack = auth.currentUser().userName + ", You have selected to move pawn to column # " + $scope.toColumn;
+          console.log(auth.currentUser().userName + ", You have selected to move pawn to column # " + $scope.toColumn);
         }
       }
     }
   };
 
   $scope.cancelMove = () => {
-    fromColumn = "";
-    toColumn = "";
+    $scope.fromColumn = "";
+    $scope.toColumn = "";
     if($location.path() == whitePath) {
+      $scope.disableWhitePlayMove = true;
+      $scope.disableWhiteCancelMove = true;
       $scope.disableWhitePlayMove = true;
       $scope.messageWhite = auth.currentUser().userName + ", You have canceled your selection";
     }
     else if($location.path() == blackPath) {
       $scope.disableBlackPlayMove = true;
+      $scope.disableWhiteCancelMove = true;
+      $scope.disableWhitePlayMove = true;
       $scope.messageBlack = auth.currentUser().userName + ", You have canceled your selection";
     }
 
@@ -181,8 +188,8 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   };
 
   $scope.playMove = () => {
-    fromColumn = "";
-    toColumn = "";
+    $scope.fromColumn = "";
+    $scope.toColumn = "";
 
     isCanSelectMove = false;
 
@@ -195,7 +202,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     console.log("Will try to play a move...")
     var headers = { 'Content-Type':'application/json', 'Accept':'application/json' }
     var config = { method:'POST', url:'http://localhost:3000/game/move', headers:headers,
-    data:JSON.stringify({'username':auth.currentUser().userName, 'gameRoomName':$routeParams.roomName, 'from':fromColumn, 'to':toColumn})}
+    data:JSON.stringify({'username':auth.currentUser().userName, 'gameRoomName':$routeParams.roomName, 'from':$scope.fromColumn, 'to':$scope.toColumn})}
 
     $http(config).then(function onSuccess(response){
       console.log("Play move response accepted...");
