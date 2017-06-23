@@ -60,12 +60,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
       isCanSelectMove = true;
       console.log("White's turn to play...")
     }
-    else {
-      isMyTurn = false;
-      isCanSelectMove = false;
-    }
-
-    if($location.path() == blackPath && isBlackTurn == true){
+    else if($location.path() == blackPath && isBlackTurn == true){
       isMyTurn = true;
       isCanSelectMove = true;
       console.log("Black's turn to play...")
@@ -138,10 +133,15 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   };
 
   $scope.pawnSelect = (column) => {
+    console.log("*********** select1");
+    console.log("***********  " + isCanSelectMove);
     if(isCanSelectMove == true){
+      console.log("*********** select2");
       if(fromColumn == ""){
+        console.log("*********** select3");
         fromColumn = column;
         if($location.path() == whitePath) {
+          console.log("*********** select4");
           $scope.disableWhiteCancelMove = false;
           $scope.messageWhite = auth.currentUser().userName + ", You have selected to move pawn from column # " + fromColumn;
         }
@@ -195,7 +195,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     console.log("Will try to play a move...")
     var headers = { 'Content-Type':'application/json', 'Accept':'application/json' }
     var config = { method:'POST', url:'http://localhost:3000/game/move', headers:headers,
-    data:JSON.stringify({'username':auth.currentUser().userName, 'gameRoomName':$routeParams.roomName}, 'from':fromColumn, 'to':toColumn)};
+    data:JSON.stringify({'username':auth.currentUser().userName, 'gameRoomName':$routeParams.roomName, 'from':fromColumn, 'to':toColumn})}
 
     $http(config).then(function onSuccess(response){
       console.log("Play move response accepted...");
