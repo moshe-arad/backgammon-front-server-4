@@ -202,14 +202,9 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   };
 
   $scope.playMove = () => {
-    $scope.fromColumn = "";
-    $scope.toColumn = "";
-
-    isCanSelectMove = false;
-
     $scope.disableWhitePlayMove = true;
     $scope.disableBlackPlayMove = true;
-
+    isCanSelectMove = false;
     $scope.disableWhiteCancelMove = true;
     $scope.disableBlackCancelMove = true;
 
@@ -224,6 +219,9 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     }, function onError(response){
         console.log("An error occured while trying to open a new game room..." + "Status code = " + response.status + ", text = " + response.statusText);
     });
+    
+    $scope.fromColumn = "";
+    $scope.toColumn = "";
   };
 
 }]);

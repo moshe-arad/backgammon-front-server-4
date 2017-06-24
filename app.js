@@ -151,7 +151,7 @@ io.on('connection', (socket) => {
 
         if(parties.all !== undefined) io.sockets.emit('lobby.update.view', response.body);
         else if(parties.group !== undefined) {
-          socket.emit('lobby.update.view', response.body);
+          if(parties.includeMe == 'yes') socket.emit('lobby.update.view', response.body);
           socket.broadcast.to(parties.group).emit('lobby.update.view', response.body);
         }
         else if(parties.user !== undefined){

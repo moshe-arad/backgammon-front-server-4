@@ -43,7 +43,7 @@ angular.module("backgammonApp")
         $rootScope.credentials = {};
         Auth.logout();
         $rootScope.socket.emit('room.leave', 'lobby');
-        $rootScope.socket.emit('lobby.update', {'group':'lobby'});
+        $rootScope.socket.emit('lobby.update', {'group':'lobby', 'includeMe':'no'});
         $rootScope.isAuthenticated = false;
 		  },function(response) {
 		    $rootScope.authenticated = false;

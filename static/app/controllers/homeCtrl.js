@@ -20,7 +20,7 @@ angular.module("backgammonApp")
 		var usersPermissionsUpdated = JSON.parse(data).usersViewChanges.usersPermissionsUpdated;
 
 		console.log("users.update.view")
-		
+
 		if(angular.isDefined(usersLoggedIn) == true){
 			for(var i=0; i<usersLoggedIn.length; i++){
 				console.log($rootScope.credentials.username)
@@ -40,7 +40,7 @@ angular.module("backgammonApp")
 				if(usersPermissionsUpdated[i].userName == auth.currentUser().userName){
 					console.log("Users Permissions Updated");
 					auth.loginNonHttp(usersPermissionsUpdated[i]);
-					$rootScope.socket.emit('lobby.update', {'group':'lobby'});
+					$rootScope.socket.emit('lobby.update', {'group':'lobby', 'includeMe':'yes'});
 					$scope.$apply();
 				}
 			}
