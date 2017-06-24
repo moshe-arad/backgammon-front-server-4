@@ -20,6 +20,8 @@ backgammonApp.run(['$rootScope', '$location', 'Auth', function ($rootScope, $loc
             Auth.logout();
             $rootScope.credentials = {};
             $rootScope.isAuthenticated = false;
+            console.log(next);
+            console.log(JSON.stringify(next));
             $location.path("/error");
         }
     });
