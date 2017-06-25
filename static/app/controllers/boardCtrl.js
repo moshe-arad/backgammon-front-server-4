@@ -21,6 +21,11 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   $scope.fromColumn = "";
   $scope.toColumn = "";
 
+  $scope.whiteEatenNum = "";
+  $scope.blackEatenNum = "";
+  $scope.whiteOutNum = "";
+  $scope.blackOutNum = "";
+
   var isMyTurn = false;
   var isCanSelectMove = false;
   var blackPath = "/black/" + $routeParams.roomName;
@@ -120,6 +125,96 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
       $scope.disableWhitePlayMove = true;
       isCanSelectMove = true;
     }
+    else if(isToApplyMove == true){
+      var from = JSON.parse(data).from;
+      var to = JSON.parse(data).to;
+      var isBlackAteWhite = JSON.parse(data).isBlackAteWhite;
+      var isWhiteAteBlack = JSON.parse(data).isWhiteAteBlack;
+      var columnSizeOnFrom = JSON.parse(data).columnSizeOnFrom;
+      var columnSizeOnTo = JSON.parse(data).columnSizeOnTo;
+      var pawnColor;
+
+      var fromElements = angular.element(".backgammon-col-" + from);
+      var toElements = angular.element(".backgammon-col-" + to);
+
+      $scope.$apply(()=>{
+        if(from == 24){
+          if($scope.whiteEatenNum - 1 == 0) $scope.whiteEatenNum = "";
+          else $scope.whiteEatenNum -= 1;
+
+          pawnColor = "W";
+        }
+        else if(from == -1){
+          if($scope.blackEatenNum - 1 == 0) $scope.blackEatenNum = "";
+          else $scope.blackEatenNum -= 1;
+
+          pawnColor = "B";
+        }
+        else if(columnSizeOnFrom <= 5){
+          if(angular.element(fromElements[0]).hasClass("bottom-col-backgammon")){
+            var cell = fromElements[columnSizeOnFrom - 1];
+            console.log("columnSizeOnFrom - 1 = " + (columnSizeOnFrom - 1));
+            console.log(cell);
+          }
+          else{
+            var cell = fromElements[5 - columnSizeOnFrom];
+            console.log("5 - columnSizeOnFrom =" + (5 - columnSizeOnFrom));
+            console.log(cell);
+          }
+          angular.element(cell).addClass("empty-cell");
+          pawnColor = angular.element(cell).text();
+          angular.element(cell).html("e");
+        }
+
+        if(to == 24){
+          if($scope.blackOutNum = "") $scope.blackOutNum = 1;
+          else $scope.blackOutNum += 1;
+        }
+        else if(to == -1){
+          if($scope.whiteOutNum = "") $scope.whiteOutNum = 1;
+          else $scope.whiteOutNum += 1;
+        }
+        else if(columnSizeOnTo <= 5){
+          if(angular.element(toElements[0]).hasClass("bottom-col-backgammon")){
+            if(columnSizeOnTo == 1) {
+              var cell = toElements[columnSizeOnTo - 1];
+              angular.element(cell).html(pawnColor);
+            }
+            else{
+              var cell = toElements[columnSizeOnTo];
+              angular.element(cell).html(pawnColor);
+              angular.element(cell).removeClass("empty-cell");
+            }
+            console.log("columnSizeOnTo= " + (columnSizeOnTo));
+            console.log(cell);
+          }
+          else {
+            if(columnSizeOnTo == 1) {
+              var cell = toElements[5 - columnSizeOnTo];
+              angular.element(cell).html(pawnColor);
+            }
+            else {
+              var cell = toElements[5 - columnSizeOnTo - 1];
+              angular.element(cell).html(pawnColor);
+              angular.element(cell).removeClass("empty-cell");
+            }
+            console.log("5 - columnSizeOnTo - 1 = " + (5 - columnSizeOnTo - 1));
+            console.log(cell);
+          }
+        }
+
+        if(angular.isDefined(isBlackAteWhite) && isBlackAteWhite != null && isBlackAteWhite == true){
+          if($scope.whiteEatenNum == "") $scope.whiteEatenNum = 1;
+          else $scope.whiteEatenNum += 1;
+        }
+
+        if(angular.isDefined(isWhiteAteBlack) && isWhiteAteBlack != null && isWhiteAteBlack == true){
+          if($scope.blackEatenNum == "") $scope.blackEatenNum = 1;
+          else $scope.blackEatenNum += 1;
+        }
+      });
+
+    }
 	});
 
   $scope.leaveGameRoom = () => {
@@ -151,8 +246,13 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   };
 
   $scope.pawnSelect = (column) => {
+    console.log(isCanSelectMove)
+    console.log($scope.fromColumn === "")
+    console.log($scope.toColumn === "")
     if(isCanSelectMove == true){
-      if($scope.fromColumn == ""){
+      if($scope.fromColumn === ""){
+        console.log($scope.fromColumn)
+        console.log($scope.fromColumn == "")
         $scope.fromColumn = column;
         if($location.path() == whitePath) {
           $scope.disableWhiteCancelMove = false;
@@ -165,7 +265,9 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
             console.log(auth.currentUser().userName + ", You have selected to move pawn from column # " + $scope.fromColumn)
         }
       }
-      else if($scope.toColumn == ""){
+      else if($scope.toColumn === ""){
+        console.log($scope.toColumn)
+        console.log(column)
         $scope.toColumn = column;
         isCanSelectMove = false;
         if($location.path() == whitePath) {
@@ -193,8 +295,8 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     }
     else if($location.path() == blackPath) {
       $scope.disableBlackPlayMove = true;
-      $scope.disableWhiteCancelMove = true;
-      $scope.disableWhitePlayMove = true;
+      $scope.disableBlackCancelMove = true;
+      $scope.disableBlackPlayMove = true;
       $scope.messageBlack = auth.currentUser().userName + ", You have canceled your selection";
     }
 
@@ -219,7 +321,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     }, function onError(response){
         console.log("An error occured while trying to open a new game room..." + "Status code = " + response.status + ", text = " + response.statusText);
     });
-    
+
     $scope.fromColumn = "";
     $scope.toColumn = "";
   };
