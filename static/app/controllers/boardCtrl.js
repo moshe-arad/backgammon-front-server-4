@@ -153,17 +153,17 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
         else if(columnSizeOnFrom <= 5){
           if(angular.element(fromElements[0]).hasClass("bottom-col-backgammon")){
             var cell = fromElements[columnSizeOnFrom - 1];
-            console.log("columnSizeOnFrom - 1 = " + (columnSizeOnFrom - 1));
-            console.log(cell);
           }
           else{
             var cell = fromElements[5 - columnSizeOnFrom];
-            console.log("5 - columnSizeOnFrom =" + (5 - columnSizeOnFrom));
-            console.log(cell);
           }
           angular.element(cell).addClass("empty-cell");
           pawnColor = angular.element(cell).text();
           angular.element(cell).html("e");
+        }
+        else{
+          var cell = fromElements[0];
+          pawnColor = angular.element(cell).text();
         }
 
         if(to == 24){
@@ -176,7 +176,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
         }
         else if(columnSizeOnTo <= 5){
           if(angular.element(toElements[0]).hasClass("bottom-col-backgammon")){
-            if(columnSizeOnTo == 1) {
+            if(columnSizeOnTo == 1 && pawnColor !== angular.element(toElements[0]).text() ) {
               var cell = toElements[columnSizeOnTo - 1];
               angular.element(cell).html(pawnColor);
             }
@@ -185,11 +185,9 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
               angular.element(cell).html(pawnColor);
               angular.element(cell).removeClass("empty-cell");
             }
-            console.log("columnSizeOnTo= " + (columnSizeOnTo));
-            console.log(cell);
           }
           else {
-            if(columnSizeOnTo == 1) {
+            if(columnSizeOnTo == 1 && pawnColor !== angular.element(toElements[4]).text()) {
               var cell = toElements[5 - columnSizeOnTo];
               angular.element(cell).html(pawnColor);
             }
@@ -198,8 +196,6 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
               angular.element(cell).html(pawnColor);
               angular.element(cell).removeClass("empty-cell");
             }
-            console.log("5 - columnSizeOnTo - 1 = " + (5 - columnSizeOnTo - 1));
-            console.log(cell);
           }
         }
 
@@ -246,13 +242,8 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   };
 
   $scope.pawnSelect = (column) => {
-    console.log(isCanSelectMove)
-    console.log($scope.fromColumn === "")
-    console.log($scope.toColumn === "")
     if(isCanSelectMove == true){
       if($scope.fromColumn === ""){
-        console.log($scope.fromColumn)
-        console.log($scope.fromColumn == "")
         $scope.fromColumn = column;
         if($location.path() == whitePath) {
           $scope.disableWhiteCancelMove = false;
@@ -266,8 +257,6 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
         }
       }
       else if($scope.toColumn === ""){
-        console.log($scope.toColumn)
-        console.log(column)
         $scope.toColumn = column;
         isCanSelectMove = false;
         if($location.path() == whitePath) {
