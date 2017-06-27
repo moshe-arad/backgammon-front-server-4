@@ -42,6 +42,10 @@ angular.module("backgammonApp")
 		    $rootScope.logoutSuccess = true;
         $rootScope.credentials = {};
         Auth.logout();
+        if($rootScope.roomName !== undefined){
+            $rootScope.socket.emit('room.leave', $rootScope.roomName);
+            $rootScope.socket.emit('game.update', {'group':$rootScope.roomName});
+        }
         $rootScope.socket.emit('room.leave', 'lobby');
         $rootScope.socket.emit('lobby.update', {'group':'lobby', 'includeMe':'no'});
         $rootScope.isAuthenticated = false;

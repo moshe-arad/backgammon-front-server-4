@@ -8,6 +8,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   $scope.messageBlack = "";
 
   $scope.roomName = $routeParams.roomName;
+  $rootScope.roomName = $routeParams.roomName
 
   $scope.disableWhiteDice = true;
   $scope.disableBlackDice = true;
