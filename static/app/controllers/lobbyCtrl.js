@@ -93,7 +93,8 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 
 				if(addWatchers[i].watcher == Auth.currentUser().userName){
 					roomName = addWatchers[i].gameRoomName;
-					promise = $interval(goToWhiteBoard, 50);
+					$rootScope.socket.emit('room.join', roomName);
+					promise = $interval(goToWatcherBoard, 50);
 				}
 			}
 		}
@@ -154,6 +155,14 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
 			$rootScope.socket.emit('room.leave', 'lobby');
 			$location.url("/black/" + roomName);
+			$interval.cancel(promise);
+		}
+	}
+
+	var goToWatcherBoard = () => {
+		if(Auth.currentUser().user_permissions.indexOf(roomName)  != -1){
+			$rootScope.socket.emit('room.leave', 'lobby');
+			$location.url("/watcher/" + roomName);
 			$interval.cancel(promise);
 		}
 	}

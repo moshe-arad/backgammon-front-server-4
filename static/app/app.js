@@ -51,6 +51,12 @@ backgammonApp.config(['$httpProvider', '$routeProvider', function ($httpProvider
     requiresAuthentication: true,
     permissions: ["user"]
 	})
+  .when("/watcher/:roomName", {
+		controller: "BoardCtrl",
+		templateUrl: "/app/partials/whiteBoard.html",
+    requiresAuthentication: true,
+    permissions: ["user"]
+	})
   .when("/black/:roomName", {
 		controller: "BoardCtrl",
 		templateUrl: "/app/partials/blackBoard.html",

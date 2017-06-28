@@ -3,6 +3,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
 
   $route.routes["/white/:roomName"].permissions.push($routeParams.roomName)
   $route.routes["/black/:roomName"].permissions.push($routeParams.roomName)
+  $route.routes["/watcher/:roomName"].permissions.push($routeParams.roomName)
 
   $scope.messageWhite = "";
   $scope.messageBlack = "";
@@ -31,6 +32,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   var isCanSelectMove = false;
   var blackPath = "/black/" + $routeParams.roomName;
   var whitePath = "/white/" + $routeParams.roomName;
+  var watcherPath = "/watcher/" + $routeParams.roomName;
 
   var authorizeUser = function(){
     if(auth.userHasPermission([$routeParams.roomName]) == false) {
@@ -54,6 +56,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
   $rootScope.socket.on('game.update.view', (data) => {
 
 		var messageToWhite = JSON.parse(data).messageToWhite;
+    var messageToWatcher = JSON.parse(data).messageToWatcher;
 		var messageToBlack = JSON.parse(data).messageToBlack;
     var isToShowRollDiceBtnToWhite = JSON.parse(data).isToShowRollDiceBtnToWhite;
     var isToShowRollDiceBtnToBlack = JSON.parse(data).isToShowRollDiceBtnToBlack;
@@ -85,6 +88,11 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
 
     if($location.path() == blackPath && angular.isDefined(messageToBlack) == true){
       $scope.messageBlack = messageToBlack;
+      $scope.$apply();
+		}
+
+    if($location.path() == watcherPath && angular.isDefined(messageToWatcher) == true){
+      $scope.messageWhite = messageToWatcher;
       $scope.$apply();
 		}
 
