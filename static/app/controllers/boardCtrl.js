@@ -222,6 +222,7 @@ function($scope, $http, auth, $routeParams, $rootScope, $route, $location){
     $http(config).then(function onSuccess(response){
       console.log("User left game room response accepted...");
       $rootScope.socket.emit('room.leave', $routeParams.roomName);
+      $rootScope.socket.emit('game.update', {'group':$rootScope.roomName});
       $rootScope.socket.emit('room.join', 'lobby');
       $rootScope.socket.emit('users.update', {'user':auth.currentUser().userName});
     }, function onError(response){
