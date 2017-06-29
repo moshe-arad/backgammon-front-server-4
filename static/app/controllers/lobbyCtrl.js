@@ -9,6 +9,7 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 	$scope.select = "Select";
 	$scope.register_error = false;
 	$scope.isMadeSelection = false;
+	$scope.isShowJoinnBtn = true;
 
 	var selectedGameRoomName;
 	var roomName;
@@ -224,7 +225,11 @@ function($scope, $http, VirtualLobby, Auth, $rootScope, $parse, $location, lobby
 			for(var i=0; i<rooms.length; i++){
 				var model = $parse('btn' + rooms[i].name)
 				if((rooms[i].name) != gameRoomName) model.assign($scope, true);
-				else $scope.select = "Unselect";
+				else{
+					$scope.select = "Unselect";
+					if(rooms[i].secondPlayer == "") $scope.isShowJoinnBtn = true;
+					else $scope.isShowJoinnBtn = false;
+				}
 			}
 
 			selectedGameRoomName = gameRoomName;
